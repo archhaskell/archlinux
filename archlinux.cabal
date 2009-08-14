@@ -1,0 +1,35 @@
+name:           archlinux
+version:        0.1
+license:        BSD3
+license-file:   LICENSE
+author:         Don Stewart <dons@galois.com>
+maintainer:     Don Stewart <dons@galois.com>
+homepage:       http://code.haskell.org/~dons/code/archlinux
+category:       Distribution
+synopsis:       Support for working with Arch Linux packages
+description:    Support for working with Arch Linux packages
+                .
+                To get info about a package:
+                .
+                > info "xmonad"
+                .
+                To find packages matching a string:
+                .
+                > search "xmonad"
+                .
+                See also the cabal2arch tool <http://hackage.haskell.org/package/cabal2arch>
+build-type:     Simple
+stability:      experimental
+cabal-version:  >= 1.2.3
+
+library
+    build-depends:  base < 6,
+                    HTTP,
+                    Cabal >= 1.6,
+                    json,
+                    pretty,
+                    prettyclass,
+                    containers
+
+    exposed-modules:
+        Distribution.ArchLinux.AUR
