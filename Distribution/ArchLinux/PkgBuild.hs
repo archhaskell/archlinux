@@ -8,7 +8,17 @@
 -- Maintainer: Don Stewart <dons@galois.com>
 --
 
-module Distribution.ArchLinux.PkgBuild where
+module Distribution.ArchLinux.PkgBuild (
+
+        PkgBuild(..),
+        emptyPkgBuild,
+
+        ArchOptions(..),
+        ArchDep(..),
+        ArchArch(..),
+        ArchList(..),
+
+    ) where
 
 import Distribution.Text
 import Distribution.Version
