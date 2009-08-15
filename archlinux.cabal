@@ -29,8 +29,11 @@ library
                     json,
                     pretty,
                     prettyclass,
-                    containers
+                    containers,
+                    filepath,
+                    xhtml
 
     exposed-modules:
         Distribution.ArchLinux.AUR
         Distribution.ArchLinux.PkgBuild
+        Distribution.ArchLinux.Report

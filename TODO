@@ -1,0 +1,19 @@
+
+    * lint checker
+        -- for all our packages, check they are consistent
+
+    * hackage version checker
+        -- automatically check versions between hackage and AUR
+
+    * cabal2arch version checker
+        -- list all packages that were generated with which version of cabal2arch,
+            then auto-rebuild
+
+    * regression builds
+
+Oh,also, anyone know how I can get the full list of arch-haskell
+maintained packages from AUR programmatically? I've found only very
+sparse documentation for the JSON interface.
+
+If we could get the full package list, we can do regression builds.
+

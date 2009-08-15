@@ -8,17 +8,7 @@
 -- Maintainer: Don Stewart <dons@galois.com>
 --
 
-module Distribution.ArchLinux.PkgBuild (
-
-        PkgBuild(..),
-        emptyPkgBuild,
-
-        ArchOptions(..),
-        ArchDep(..),
-        ArchArch(..),
-        ArchList(..),
-
-    ) where
+module Distribution.ArchLinux.PkgBuild where
 
 import Distribution.Text
 import Distribution.Version
@@ -29,7 +19,14 @@ import Distribution.License
 import Text.PrettyPrint
 import Data.List
 import Data.Monoid
+import Data.Maybe
 import Debug.Trace
+
+import Control.Monad
+import Control.Monad.Instances
+import Data.Char
+import Numeric
+
 
 --
 -- | A data type to represent PKGBUILD files
@@ -247,4 +244,211 @@ dispNoQuotes (ArchList xs) =
                 (intersperse space
                     (map disp xs)))
 
+
+------------------------------------------------------------------------
+-- Support for parsing PKGBULIDs
+
+-- | A PKGBUILD data structure with additional metadata
+data AnnotatedPkgBuild =
+     AnnotatedPkgBuild
+        {pkgBuiltWith :: Maybe Version   -- ^ version of cabal2arch used, if any
+        ,pkgHeader    :: String          -- ^ header strings
+        ,pkgBody      :: PkgBuild }      -- ^ contents of pkgbuild file
+    deriving (Eq, Show)
+
+-- | Empty state structure
+emptyPkg :: AnnotatedPkgBuild
+emptyPkg = AnnotatedPkgBuild
+    { pkgBuiltWith = Nothing
+    , pkgHeader    = []
+    , pkgBody      = emptyPkgBuild { arch_options = ArchList []
+                                , arch_makedepends = ArchList []
+                                }
+    }
+
+-- | Result type for pkgbuild parsers
+type ResultP a = Either String a
+
+decodePackage :: String -> ResultP AnnotatedPkgBuild
+decodePackage s = runGetPKG (readPackage emptyPkg) s
+
+-- | The type of pkgbuild parsers for String
+newtype GetPKG a = GetPKG { un :: String -> Either String (a,String) }
+
+instance Functor GetPKG where fmap = liftM
+
+instance Monad GetPKG where
+  return x       = GetPKG (\s -> Right (x,s))
+  fail x         = GetPKG (\_ -> Left x)
+  GetPKG m >>= f = GetPKG (\s -> case m s of
+                                     Left err -> Left err
+                                     Right (a,s1) -> un (f a) s1)
+
+------------------------------------------------------------------------
+
+-- | Run a PKG reader on an input String, returning a PKGBUILD
+runGetPKG :: GetPKG a -> String -> ResultP a
+runGetPKG (GetPKG m) s = case m s of
+     Left err    -> Left err
+     Right (a,t) -> case t of
+                        [] -> Right a
+                        _  -> Left $ "Invalid tokens at end of PKG string: "++ show (take 10 t)
+
+getInput   :: GetPKG String
+getInput    = GetPKG (\s -> Right (s,s))
+
+setInput   :: String -> GetPKG ()
+setInput s  = GetPKG (\_ -> Right ((),s))
+
+(<$>) :: Functor f => (a -> b) -> f a -> f b
+x <$> y = fmap x y
+
+------------------------------------------------------------------------
+
+-- read until end of line
+line s = case break (== '\n') s of
+    (h , _ : rest) -> do
+        setInput rest
+        return h
+
+-- | Recursively parse the pkgbuild
+--
+readPackage :: AnnotatedPkgBuild -> GetPKG AnnotatedPkgBuild
+readPackage st = do
+  cs <- getInput
+
+  case cs of
+    _ | "# Contributor"       `isPrefixOf` cs -> do
+            h <- line cs
+            readPackage st { pkgHeader = h }
+
+      | "# Package generated" `isPrefixOf` cs -> do
+            h <- line cs
+            let v = simpleParse
+                    . reverse
+                    . takeWhile (not . isSpace)
+                    . reverse $ h
+            readPackage st { pkgBuiltWith = v }
+
+      | "pkgname="  `isPrefixOf` cs -> do
+            h <- line cs
+            let s = drop 8 h
+            readPackage st { pkgBody = (pkgBody st) { arch_pkgname = s } }
+
+      | "pkgrel="   `isPrefixOf` cs -> do
+            h <- line cs
+            let s = drop 7 h
+            readPackage st { pkgBody = (pkgBody st) { arch_pkgrel = read s } }
+
+      | "pkgver="   `isPrefixOf` cs -> do
+            h <- line cs
+            let s = drop 7 h
+            case simpleParse s of
+                Nothing -> fail $ "Unable to parse package version"
+                Just v  -> readPackage st { pkgBody = (pkgBody st) { arch_pkgver = v } }
+
+      | "pkgdesc="  `isPrefixOf` cs -> do
+            h <- line cs
+            let s = drop 8 h
+            readPackage st { pkgBody = (pkgBody st) { arch_pkgdesc = s } }
+
+      | "url="      `isPrefixOf` cs -> do
+            h <- line cs
+            let s = drop 4 h
+            readPackage st { pkgBody = (pkgBody st) { arch_url = s } }
+
+      | "license="  `isPrefixOf` cs -> do
+            h <- line cs
+            let s = takeWhile (/= '\'')
+                    . drop 1
+                    . dropWhile (/= '\'')
+                    . drop 8 $ h
+                s' | "custom:" `isPrefixOf` s = drop 7 s
+                   | otherwise                = s
+
+            case simpleParse s' of
+                Nothing -> fail $ "Invalid license: " ++ s'
+                Just l  -> readPackage st { pkgBody = (pkgBody st) { arch_license = ArchList [l] } }
+
+    -- do these later:
+
+      | "arch="     `isPrefixOf` cs
+            -> do _ <- line cs ; readPackage st
+      | "makedepends=" `isPrefixOf` cs
+            -> do _ <- line cs ; readPackage st
+      | "depends="  `isPrefixOf` cs
+            -> do _ <- line cs ; readPackage st
+      | "options="  `isPrefixOf` cs
+            -> do _ <- line cs ; readPackage st
+      | "source="   `isPrefixOf` cs
+            -> do _ <- line cs ; readPackage st
+      | "install="  `isPrefixOf` cs
+            -> do _ <- line cs ; readPackage st
+      | "md5sums="  `isPrefixOf` cs
+            -> do _ <- line cs ; readPackage st
+      | "build()"   `isPrefixOf` cs
+            -> do setInput [] ; return st
+
+      | otherwise -> fail $ "Malformed PKGBUILD: " ++ take 80 cs
+
+
+------------------------------------------------------------------------
+
+
+
+{-
+# Contributor: Arch Haskell Team <arch-haskell@haskell.org>
+# Package generated by cabal2arch 0.6.1
+pkgname=haskell-pcre-light
+pkgrel=2
+pkgver=0.3.1
+pkgdesc="A small, efficient and portable regex library for Perl 5 compatible regular expressions"
+url="http://hackage.haskell.org/package/pcre-light"
+license=('custom:BSD3')
+arch=('i686' 'x86_64')
+makedepends=()
+depends=('ghc' 'haskell-cabal' 'pcre')
+options=('strip')
+source=(http://hackage.haskell.org/packages/archive/pcre-light/0.3.1/pcre-light-0.3.1.tar.gz)
+install=haskell-pcre-light.install
+md5sums=('14d8d6e2fd200c385b1d63c888794014')
+build() {
+    cd ${srcdir}/pcre-light-0.3.1
+    runhaskell Setup configure --prefix=/usr --docdir=/usr/share/doc/${pkgname} || return 1
+    runhaskell Setup build                   || return 1
+    runhaskell Setup haddock || return 1
+    runhaskell Setup register   --gen-script || return 1
+    runhaskell Setup unregister --gen-script || return 1
+    install -D -m744 register.sh   ${pkgdir}/usr/share/haskell/$pkgname/register.sh
+    install    -m744 unregister.sh ${pkgdir}/usr/share/haskell/$pkgname/unregister.sh
+    install -d -m755 $pkgdir/usr/share/doc/ghc/libraries
+    ln -s /usr/share/doc/${pkgname}/html ${pkgdir}/usr/share/doc/ghc/libraries/pcre-light
+    runhaskell Setup copy --destdir=${pkgdir} || return 1
+    install -D -m644 LICENSE ${pkgdir}/usr/share/licenses/$pkgname/LICENSE || return 1
+    rm -f ${pkgdir}/usr/share/doc/${pkgname}/LICENSE
+}
+    -}
+
+------------------------------------------------------------------------
+-- Checker
+--
+
+type Warnings = String
+
+-- Hard code the cabal2arch version
+recentCabal2ArchVersion :: Maybe Version
+recentCabal2ArchVersion = case simpleParse "0.4" of
+    Nothing -> error "Unable to parse cabal2arch version"
+    Just v  -> Just v
+
+-- | Look for problems in the PKGBUILD
+oldCabal2Arch :: AnnotatedPkgBuild -> Bool
+oldCabal2Arch s
+    | isNothing (pkgBuiltWith s)
+    = True
+
+    | pkgBuiltWith s < recentCabal2ArchVersion
+    = True -- ["Old version of cabal2arch: " ++ display (fromJust (pkgBuiltWith s))]
+
+    | otherwise                             = False
 
