@@ -367,7 +367,7 @@ readPackage st = do
                    | otherwise                = s
 
             case simpleParse s' of
-                Nothing -> fail $ "Invalid license: " ++ s'
+                Nothing -> readPackage st { pkgBody = (pkgBody st) { arch_license = ArchList [UnknownLicense s'] } }
                 Just l  -> readPackage st { pkgBody = (pkgBody st) { arch_license = ArchList [l] } }
 
     -- do these later:
@@ -388,6 +388,10 @@ readPackage st = do
             -> do _ <- line cs ; readPackage st
       | "build()"   `isPrefixOf` cs
             -> do setInput [] ; return st
+
+    -- skip comments
+      | "#" `isPrefixOf` cs
+            -> do _ <- line cs ; readPackage st
 
       | otherwise -> fail $ "Malformed PKGBUILD: " ++ take 80 cs
 
