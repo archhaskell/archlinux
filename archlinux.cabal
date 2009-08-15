@@ -23,7 +23,7 @@ stability:      experimental
 cabal-version:  >= 1.2.3
 
 library
-    build-depends:  base < 6,
+    build-depends:  base >= 4 && < 6,
                     HTTP,
                     Cabal >= 1.6,
                     json,
@@ -31,7 +31,9 @@ library
                     prettyclass,
                     containers,
                     filepath,
-                    xhtml
+                    xhtml,
+                    process,
+                    directory
 
     exposed-modules:
         Distribution.ArchLinux.AUR
