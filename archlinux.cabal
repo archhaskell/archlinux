@@ -1,5 +1,5 @@
 name:           archlinux
-version:        0.1
+version:        0.2
 license:        BSD3
 license-file:   LICENSE
 author:         Don Stewart <dons@galois.com>
@@ -33,3 +33,4 @@ library
 
     exposed-modules:
         Distribution.ArchLinux.AUR
+        Distribution.ArchLinux.PkgBuild
