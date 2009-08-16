@@ -33,7 +33,10 @@ library
                     filepath,
                     xhtml,
                     process,
-                    directory
+                    directory,
+                    parallel,
+                    strict-concurrency,
+                    old-time
 
     exposed-modules:
         Distribution.ArchLinux.AUR
