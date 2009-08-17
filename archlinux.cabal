@@ -43,7 +43,8 @@ library
                     directory,
                     parallel,
                     strict-concurrency,
-                    old-time
+                    old-time,
+                    csv
 
     exposed-modules:
         Distribution.ArchLinux.AUR
