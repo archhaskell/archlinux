@@ -441,7 +441,7 @@ type Warnings = String
 
 -- Hard code the cabal2arch version
 recentCabal2ArchVersion :: Maybe Version
-recentCabal2ArchVersion = case simpleParse "0.4" of
+recentCabal2ArchVersion = case simpleParse "0.6" of
     Nothing -> error "Unable to parse cabal2arch version"
     Just v  -> Just v
 
