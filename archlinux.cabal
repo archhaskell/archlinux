@@ -1,5 +1,5 @@
 name:           archlinux
-version:        0.2.4
+version:        0.3
 license:        BSD3
 license-file:   LICENSE
 author:         Don Stewart <dons@galois.com>
@@ -17,6 +17,10 @@ description:    Support for working with Arch Linux packages
                 .
                 > search "xmonad"
                 .
+                To find packages owned by a maintainer:
+                .
+                > maintainer "arch-haskell"
+                . 
                 Generate an html page of interesting facts about 
                 packages in AUR and Hackage.
                 .
