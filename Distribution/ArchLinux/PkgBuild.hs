@@ -1,8 +1,8 @@
-{-# LANGUAGE TypeSynonymInstances        #-}
+{-# LANGUAGE TypeSynonymInstances       #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 -- |
 -- Module    : Distribution.ArchLinux.PkgBuild
--- Copyright : (c) Don Stewart, 2008-2009
+-- Copyright : (c) Don Stewart, 2008-2010
 -- License   : BSD3
 --
 -- Maintainer: Don Stewart <dons@galois.com>
@@ -441,7 +441,7 @@ type Warnings = String
 
 -- Hard code the cabal2arch version
 recentCabal2ArchVersion :: Maybe Version
-recentCabal2ArchVersion = case simpleParse "0.6" of
+recentCabal2ArchVersion = case simpleParse "0.7" of -- XXX
     Nothing -> error "Unable to parse cabal2arch version"
     Just v  -> Just v
 
