@@ -46,6 +46,7 @@ library
                     process,
                     directory,
                     parallel,
+                    deepseq,
                     strict-concurrency,
                     old-time,
                     csv
