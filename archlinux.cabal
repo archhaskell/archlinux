@@ -1,5 +1,5 @@
 name:           archlinux
-version:        0.3.1
+version:        0.3.2
 license:        BSD3
 license-file:   LICENSE
 author:         Don Stewart <dons@galois.com>
@@ -30,8 +30,8 @@ description:    Support for working with Arch Linux packages
                 for conversion between Hackage and AUR.
 
 build-type:     Simple
-stability:      experimental
-cabal-version:  >= 1.2.3
+stability:      stable
+cabal-version:  >= 1.8
 
 library
     build-depends:  base >= 4 && < 6,
@@ -52,6 +52,153 @@ library
                     csv
 
     exposed-modules:
+        Distribution.ArchLinux.AUR
+        Distribution.ArchLinux.PkgBuild
+        Distribution.ArchLinux.Report
+
+executable arch-report
+    main-is: scripts/arch-report.hs
+    build-depends:
+        base >= 4 && < 6,
+        HTTP,
+        Cabal >= 1.6,
+        json,
+        pretty,
+        prettyclass,
+        containers,
+        filepath,
+        xhtml,
+        process,
+        directory,
+        parallel,
+        deepseq,
+        strict-concurrency,
+        old-time,
+        csv
+
+    other-modules:
+        Distribution.ArchLinux.Report
+
+executable distro-map
+    main-is: scripts/distro-map.hs
+    build-depends:
+        base >= 4 && < 6,
+        HTTP,
+        Cabal >= 1.6,
+        json,
+        pretty,
+        prettyclass,
+        containers,
+        filepath,
+        xhtml,
+        process,
+        directory,
+        parallel,
+        deepseq,
+        strict-concurrency,
+        old-time,
+        csv
+
+    other-modules:
+        Distribution.ArchLinux.AUR
+        Distribution.ArchLinux.PkgBuild
+        Distribution.ArchLinux.Report
+
+executable get-arch-url
+    main-is: scripts/get-arch-url.hs
+    build-depends:
+        base >= 4 && < 6,
+        HTTP,
+        Cabal >= 1.6,
+        json,
+        pretty,
+        prettyclass,
+        containers,
+        filepath,
+        xhtml,
+        process,
+        directory,
+        parallel,
+        deepseq,
+        strict-concurrency,
+        old-time,
+        csv
+
+    other-modules:
+        Distribution.ArchLinux.AUR
+
+executable latest-cabal
+    main-is: scripts/latest-cabal.hs
+    build-depends:
+        base >= 4 && < 6,
+        HTTP,
+        Cabal >= 1.6,
+        json,
+        pretty,
+        prettyclass,
+        containers,
+        filepath,
+        xhtml,
+        process,
+        directory,
+        parallel,
+        deepseq,
+        strict-concurrency,
+        old-time,
+        csv
+
+    other-modules:
+        Distribution.ArchLinux.Report
+
+executable mypackages
+    main-is: scripts/mypackages.hs
+    build-depends:
+        base >= 4 && < 6,
+        HTTP,
+        Cabal >= 1.6,
+        json,
+        pretty,
+        prettyclass,
+        containers,
+        filepath,
+        xhtml,
+        process,
+        directory,
+        parallel,
+        deepseq,
+        strict-concurrency,
+        old-time,
+        csv
+
+    other-modules:
+        Distribution.ArchLinux.AUR
+
+executable update-aur-log 
+    main-is: scripts/update-aur-log.hs
+    build-depends:
+        base >= 4 && < 6
+
+executable needs-updates
+    main-is: scripts/needs-updates.hs
+    build-depends:
+        base >= 4 && < 6,
+        HTTP,
+        Cabal >= 1.6,
+        json,
+        pretty,
+        prettyclass,
+        containers,
+        filepath,
+        xhtml,
+        process,
+        directory,
+        parallel,
+        deepseq,
+        strict-concurrency,
+        old-time,
+        csv
+
+    other-modules:
         Distribution.ArchLinux.AUR
         Distribution.ArchLinux.PkgBuild
         Distribution.ArchLinux.Report
