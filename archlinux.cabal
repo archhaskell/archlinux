@@ -78,6 +78,7 @@ executable arch-report
 
     other-modules:
         Distribution.ArchLinux.Report
+        Distribution.ArchLinux.AUR
 
 executable distro-map
     main-is: scripts/distro-map.hs
@@ -127,30 +128,7 @@ executable get-arch-url
     other-modules:
         Distribution.ArchLinux.AUR
 
-executable latest-cabal
-    main-is: scripts/latest-cabal.hs
-    build-depends:
-        base >= 4 && < 6,
-        HTTP,
-        Cabal >= 1.6,
-        json,
-        pretty,
-        prettyclass,
-        containers,
-        filepath,
-        xhtml,
-        process,
-        directory,
-        parallel,
-        deepseq,
-        strict-concurrency,
-        old-time,
-        csv
-
-    other-modules:
-        Distribution.ArchLinux.Report
-
-executable mypackages
+executable arch-haskell-packages
     main-is: scripts/mypackages.hs
     build-depends:
         base >= 4 && < 6,
@@ -177,28 +155,3 @@ executable update-aur-log
     main-is: scripts/update-aur-log.hs
     build-depends:
         base >= 4 && < 6
-
-executable needs-updates
-    main-is: scripts/needs-updates.hs
-    build-depends:
-        base >= 4 && < 6,
-        HTTP,
-        Cabal >= 1.6,
-        json,
-        pretty,
-        prettyclass,
-        containers,
-        filepath,
-        xhtml,
-        process,
-        directory,
-        parallel,
-        deepseq,
-        strict-concurrency,
-        old-time,
-        csv
-
-    other-modules:
-        Distribution.ArchLinux.AUR
-        Distribution.ArchLinux.PkgBuild
-        Distribution.ArchLinux.Report
