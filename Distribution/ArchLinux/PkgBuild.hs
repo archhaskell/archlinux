@@ -430,8 +430,12 @@ readDepends s =
 
 -- TODO : read version spec
 str2archdep :: String -> ArchDep
-str2archdep s = ArchDep (Dependency (PackageName name) AnyVersion)
+str2archdep s = case v of
+    Nothing -> ArchDep (Dependency (PackageName name) AnyVersion)
+    Just w -> ArchDep (Dependency (PackageName name) w)
   where name = takeWhile (\x -> x `notElem` "<=>") s
+        vspec = dropWhile (\x -> x `notElem` "<=>") s
+        v = simpleParse vspec
 
 ------------------------------------------------------------------------
 -- Pretty printing:
