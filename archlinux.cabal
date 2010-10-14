@@ -14,6 +14,10 @@ description:    Support for working with Arch Linux packages
 build-type:     Simple
 stability:      stable
 cabal-version:  >= 1.8
+source-repository head
+  type:         git
+  location:     git://github.com/archhaskell/archlinux.git
+
 
 library
     build-depends:  base >= 4 && < 6,
