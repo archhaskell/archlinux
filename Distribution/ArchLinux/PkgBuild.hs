@@ -373,13 +373,19 @@ readPackage st = do
                 Nothing -> readPackage st { pkgBody = (pkgBody st) { arch_license = ArchList [UnknownLicense s'] } }
                 Just l  -> readPackage st { pkgBody = (pkgBody st) { arch_license = ArchList [l] } }
 
+      | "depends=("  `isPrefixOf` cs -> do
+            h <- line cs
+            let s = drop 9 h
+            readPackage st { pkgBody = (pkgBody st) { arch_depends = readDepends s } }
+
+      | "makedepends=("  `isPrefixOf` cs -> do
+            h <- line cs
+            let s = drop 13 h
+            readPackage st { pkgBody = (pkgBody st) { arch_makedepends = readDepends s } }
+
     -- do these later:
 
       | "arch="     `isPrefixOf` cs
-            -> do _ <- line cs ; readPackage st
-      | "makedepends=" `isPrefixOf` cs
-            -> do _ <- line cs ; readPackage st
-      | "depends="  `isPrefixOf` cs
             -> do _ <- line cs ; readPackage st
       | "options="  `isPrefixOf` cs
             -> do _ <- line cs ; readPackage st
@@ -400,6 +406,26 @@ readPackage st = do
 
       | otherwise -> fail $ "Malformed PKGBUILD: " ++ take 80 cs
 
+--
+-- | Read a quoted list of depends
+--
+readDepends :: String -> ArchList ArchDep
+readDepends s =
+  let s1 = dropWhile (\x -> x `elem` "' )") s
+    in case s1 of
+      "" -> ArchList []
+      _ -> ArchList (d:ds)
+        where dep = takeWhile (\x -> x `notElem` "' ") s1
+              -- end of the dep field
+              s2 = dropWhile (\x -> x `notElem` "' ") s1
+              s3 = dropWhile (\x -> x `elem` "' ") s2
+              d = str2archdep dep
+              ArchList ds = readDepends s3
+
+-- TODO : read version spec
+str2archdep :: String -> ArchDep
+str2archdep s = ArchDep (Dependency (PackageName name) AnyVersion)
+  where name = takeWhile (\x -> x `notElem` "<=>") s
 
 ------------------------------------------------------------------------
 -- Pretty printing:
