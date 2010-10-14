@@ -106,6 +106,6 @@ trueDepends p repo = L.filter (\p -> not $ isExternalDep p repo) (strDepends p)
 -- | Enumerate all build-time dependencies for a package
 --
 strDepends :: PkgBuild -> [String]
-strDepends PkgBuild { arch_depends = ArchList deps }
+strDepends PkgBuild { arch_depends = ArchList deps
                     , arch_makedepends = ArchList makedeps }
                     = L.map pkgnameFromArchDep (deps ++ makedeps)
