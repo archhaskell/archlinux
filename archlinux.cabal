@@ -8,24 +8,6 @@ homepage:       http://code.haskell.org/~dons/code/archlinux
 category:       Distribution
 synopsis:       Support for working with Arch Linux packages
 description:    Support for working with Arch Linux packages
-                .
-                To get info about a package:
-                .
-                > info "xmonad"
-                .
-                To find packages matching a string:
-                .
-                > search "xmonad"
-                .
-                To find packages owned by a maintainer:
-                .
-                > maintainer "arch-haskell"
-                . 
-                Generate an html page of interesting facts about 
-                packages in AUR and Hackage.
-                .
-                > report ["xmonad"]
-                .
                 See also the cabal2arch tool <http://hackage.haskell.org/package/cabal2arch>
                 for conversion between Hackage and AUR.
 
@@ -35,123 +17,10 @@ cabal-version:  >= 1.8
 
 library
     build-depends:  base >= 4 && < 6,
-                    HTTP,
                     Cabal >= 1.6,
-                    json,
                     pretty,
-                    prettyclass,
                     containers,
-                    filepath,
-                    xhtml,
-                    process,
-                    directory,
-                    parallel,
-                    deepseq,
-                    strict-concurrency,
-                    old-time,
-                    csv
+                    directory
 
     exposed-modules:
-        Distribution.ArchLinux.AUR
         Distribution.ArchLinux.PkgBuild
-        Distribution.ArchLinux.Report
-
-executable arch-report
-    main-is: scripts/arch-report.hs
-    build-depends:
-        base >= 4 && < 6,
-        HTTP,
-        Cabal >= 1.6,
-        json,
-        pretty,
-        prettyclass,
-        containers,
-        filepath,
-        xhtml,
-        process,
-        directory,
-        parallel,
-        deepseq,
-        strict-concurrency,
-        old-time,
-        csv
-
-    other-modules:
-        Distribution.ArchLinux.Report
-        Distribution.ArchLinux.AUR
-
-executable distro-map
-    main-is: scripts/distro-map.hs
-    build-depends:
-        base >= 4 && < 6,
-        HTTP,
-        Cabal >= 1.6,
-        json,
-        pretty,
-        prettyclass,
-        containers,
-        filepath,
-        xhtml,
-        process,
-        directory,
-        parallel,
-        deepseq,
-        strict-concurrency,
-        old-time,
-        csv
-
-    other-modules:
-        Distribution.ArchLinux.AUR
-        Distribution.ArchLinux.PkgBuild
-        Distribution.ArchLinux.Report
-
-executable get-arch-url
-    main-is: scripts/get-arch-url.hs
-    build-depends:
-        base >= 4 && < 6,
-        HTTP,
-        Cabal >= 1.6,
-        json,
-        pretty,
-        prettyclass,
-        containers,
-        filepath,
-        xhtml,
-        process,
-        directory,
-        parallel,
-        deepseq,
-        strict-concurrency,
-        old-time,
-        csv
-
-    other-modules:
-        Distribution.ArchLinux.AUR
-
-executable arch-haskell-packages
-    main-is: scripts/mypackages.hs
-    build-depends:
-        base >= 4 && < 6,
-        HTTP,
-        Cabal >= 1.6,
-        json,
-        pretty,
-        prettyclass,
-        containers,
-        filepath,
-        xhtml,
-        process,
-        directory,
-        parallel,
-        deepseq,
-        strict-concurrency,
-        old-time,
-        csv
-
-    other-modules:
-        Distribution.ArchLinux.AUR
-
-executable update-aur-log 
-    main-is: scripts/update-aur-log.hs
-    build-depends:
-        base >= 4 && < 6
