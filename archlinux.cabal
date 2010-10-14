@@ -6,8 +6,8 @@ author:         Don Stewart <dons@galois.com>
 maintainer:     ArchHaskell Team <arch-haskell@haskell.org>
 homepage:       http://github.com/archhaskell/
 category:       Distribution
-synopsis:       Support for working with Arch Linux packages
-description:    Support for working with Arch Linux packages
+synopsis:       Support for working with Arch Linux packages.
+description:    Support for working with Arch Linux packages.
                 See also the cabal2arch tool <http://hackage.haskell.org/package/cabal2arch>
                 for conversion between Hackage and AUR.
 
