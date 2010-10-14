@@ -3,8 +3,8 @@ version:        0.3.4
 license:        BSD3
 license-file:   LICENSE
 author:         Don Stewart <dons@galois.com>
-maintainer:     Don Stewart <dons@galois.com>
-homepage:       http://code.haskell.org/~dons/code/archlinux
+maintainer:     ArchHaskell Team <arch-haskell@haskell.org>
+homepage:       http://github.com/archhaskell/
 category:       Distribution
 synopsis:       Support for working with Arch Linux packages
 description:    Support for working with Arch Linux packages
