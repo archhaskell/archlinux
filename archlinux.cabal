@@ -10,14 +10,13 @@ synopsis:       Support for working with Arch Linux packages.
 description:    Support for working with Arch Linux packages.
                 See also the cabal2arch tool <http://hackage.haskell.org/package/cabal2arch>
                 for conversion between Hackage and AUR.
-
 build-type:     Simple
 stability:      stable
 cabal-version:  >= 1.8
+
 source-repository head
   type:         git
   location:     git://github.com/archhaskell/archlinux.git
-
 
 library
     build-depends:  base >= 4 && < 6,
