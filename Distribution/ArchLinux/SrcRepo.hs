@@ -18,6 +18,7 @@ import Text.PrettyPrint
 
 import Data.List as L
 import Data.Map as M
+import Data.Maybe
 import System.FilePath
 import System.Directory as Dir
 import Control.Monad
@@ -67,10 +68,13 @@ insertpkg m dir = do
     Nothing -> return m
     Just p -> return $ M.insert (takeBaseName dir) p m
 
+---------------------------------------------------------------------------
+--
+-- Only pure functions below
+
 --
 -- | Dumps a topologically sorted list of packages
 -- starting with an optionally given key
--- TODO : version checking
 --
 dumpContentsTopo :: SrcRepo -> [String]
 dumpContentsTopo repo
@@ -109,3 +113,36 @@ strDepends :: PkgBuild -> [String]
 strDepends PkgBuild { arch_depends = ArchList deps
                     , arch_makedepends = ArchList makedeps }
                     = L.map pkgnameFromArchDep (deps ++ makedeps)
+
+--
+-- | Find version inconsistencies in a repository
+--
+isConflicting :: SrcRepo -> Bool
+isConflicting repo = and areConflicting
+  where listOfPkgs = M.toList $ repo_contents repo
+        areConflicting = L.map (\(k,pkg) -> pkg `isConflictingWith` repo) listOfPkgs
+
+listVersionConflicts :: SrcRepo -> [String]
+listVersionConflicts repo = L.map fst listConflicting
+  where listOfPkgs = M.toList $ repo_contents repo
+        listConflicting = L.filter (\(k,pkg) -> pkg `isConflictingWith` repo) listOfPkgs
+
+--
+-- | Check package dependencies against the repo
+--
+isConflictingWith :: PkgBuild -> SrcRepo -> Bool
+PkgBuild { arch_depends = ArchList deps
+         , arch_makedepends = ArchList makedeps
+         } `isConflictingWith` repo = not (and satisfied)
+  where satisfied = Data.Maybe.mapMaybe (\dep -> isSatisfiedBy dep repo) (deps ++ makedeps)
+
+--
+-- | check for existence of the right version is the repository
+-- (return Nothing if package not found)
+--
+isSatisfiedBy :: ArchDep -> SrcRepo -> Maybe Bool
+ArchDep (Dependency (PackageName depname) vrange) `isSatisfiedBy` repo = case deppkg of
+    Nothing -> Nothing
+    Just pkgbuild -> Just ((arch_pkgver pkgbuild) `withinRange` vrange)
+  where
+    deppkg = M.lookup depname (repo_contents repo)
