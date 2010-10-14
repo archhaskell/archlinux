@@ -107,7 +107,9 @@ data PkgBuild =
     , arch_build        :: [String]
         -- ^
         -- The build hook
-
+    , arch_package        :: [String]
+        -- ^
+        -- The packaging hook
     , arch_install      :: Maybe String
         -- ^
         -- Specifies a special install script that is to be included in the package. This
@@ -158,6 +160,7 @@ emptyPkgBuild =
     , arch_md5sum      = ArchList []
         -- sha1sums=('a08670e4c749850714205f425cb460ed5a0a56b2')
     , arch_build       = []
+    , arch_package     = []
     , arch_install     = Nothing  -- executable
     , arch_options     = ArchList [Strip]
     }
@@ -387,6 +390,8 @@ readPackage st = do
       | "md5sums="  `isPrefixOf` cs
             -> do _ <- line cs ; readPackage st
       | "build()"   `isPrefixOf` cs
+            -> do setInput [] ; return st
+      | "package()"  `isPrefixOf` cs
             -> do setInput [] ; return st
 
     -- skip comments
