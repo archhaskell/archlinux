@@ -1,5 +1,5 @@
 --
--- | This test reads the current directory and dumps a topologically sorted package list
+-- | This test reads the current directory and prints the list of conflicting packages
 --
 
 import Distribution.ArchLinux.SrcRepo
