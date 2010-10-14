@@ -99,8 +99,13 @@ isExternalDep :: String -> SrcRepo -> Bool
 isExternalDep name (SrcRepo {repo_contents = m}) =
   (name `notMember` m) || (name `elem` archProvidedPkgs)
 
-strDepends :: PkgBuild -> [String]
-strDepends PkgBuild { arch_depends = ArchList deps } = L.map pkgnameFromArchDep deps
-
 trueDepends :: PkgBuild -> SrcRepo -> [String]
 trueDepends p repo = L.filter (\p -> not $ isExternalDep p repo) (strDepends p)
+
+--
+-- | Enumerate all build-time dependencies for a package
+--
+strDepends :: PkgBuild -> [String]
+strDepends PkgBuild { arch_depends = ArchList deps }
+                    , arch_makedepends = ArchList makedeps }
+                    = L.map pkgnameFromArchDep (deps ++ makedeps)
