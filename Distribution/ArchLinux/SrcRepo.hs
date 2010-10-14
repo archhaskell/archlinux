@@ -73,14 +73,15 @@ insertpkg m dir = do
 -- TODO : version checking
 --
 dumpContentsTopo :: SrcRepo -> [String]
-dumpContentsTopo repo =
-  -- find leaf packages
-  let m = repo_contents repo
+dumpContentsTopo repo
+  | M.null m = []
+  | otherwise = leafNames ++ (dumpContentsTopo $ repo {repo_contents = notLeaves})
+  where -- find leaf packages
+      m = repo_contents repo
       isLeaf pbuild = (trueDepends pbuild repo) == []
       leafList = L.filter (isLeaf . snd) (M.toList m)
       leafNames = L.map fst leafList
       notLeaves = M.filterWithKey (\n -> \pkg -> n `notElem` leafNames) m
-  in leafNames ++ (dumpContentsTopo $ SrcRepo {repo_contents = notLeaves})
 
 --- We temporarily duplicate here the list of pseudo-dependencies
 archProvidedPkgs :: [String]
