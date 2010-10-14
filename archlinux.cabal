@@ -20,7 +20,9 @@ library
                     Cabal >= 1.6,
                     pretty,
                     containers,
-                    directory
+                    directory,
+                    filepath
 
     exposed-modules:
         Distribution.ArchLinux.PkgBuild
+        Distribution.ArchLinux.SrcRepo
