@@ -214,6 +214,12 @@ instance Text ArchDep where
   parse = undefined
 
 --
+-- | Extract just the package name from ArchDep
+--
+pkgnameFromArchDep :: ArchDep -> String
+pkgnameFromArchDep (ArchDep (Dependency (PackageName p) v)) = p
+
+--
 -- | Valid linux platforms
 --
 data ArchArch = Arch_X86 | Arch_X86_64
