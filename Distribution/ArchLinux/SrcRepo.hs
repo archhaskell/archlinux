@@ -106,6 +106,8 @@ isExternalDep name (SrcRepo {repo_contents = m}) =
 trueDepends :: PkgBuild -> SrcRepo -> [String]
 trueDepends p repo = L.filter (\p -> not $ isExternalDep p repo) (strDepends p)
 
+------------------------------------------------------------
+
 --
 -- | Enumerate all build-time dependencies for a package
 --
@@ -129,6 +131,20 @@ getDependencyRepo pkg repo = case M.lookup pkg $ repo_contents repo of
   Just p -> repo { repo_contents = M.insert pkg p (unions recDeps) }
               where trueDeps = trueDepends p repo
                     recDeps = L.map (repo_contents . (\d -> getDependencyRepo d repo)) trueDeps
+
+--
+-- | Output reverse dependencies of a package in topological order
+--
+getReverseDependencies :: String -> SrcRepo -> [String]
+getReverseDependencies pkg repo = dumpContentsTopo $ getReverseDependencyRepo pkg repo
+
+--
+-- | Extract reverse dependencies of a package
+--
+getReverseDependencyRepo :: String -> SrcRepo -> SrcRepo
+getReverseDependencyRepo pkg repo = repo { repo_contents = revdeps }
+  where revdeps = M.filterWithKey (isarevdep) (repo_contents repo)
+        isarevdep k _ = M.member pkg (repo_contents $ getDependencyRepo k repo)
 
 ----------------------------------------------------------------
 --
