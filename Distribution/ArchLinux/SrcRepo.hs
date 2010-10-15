@@ -115,6 +115,26 @@ strDepends PkgBuild { arch_depends = ArchList deps
                     = L.map pkgnameFromArchDep (deps ++ makedeps)
 
 --
+-- | Output the recursive dependencies of a package in topological order
+--
+getDependencies :: String -> SrcRepo -> [String]
+getDependencies pkg repo = dumpContentsTopo $ getDependencyRepo pkg repo
+
+--
+-- | Extract the subrepository of recursive dependencies of a package
+--
+getDependencyRepo :: String -> SrcRepo -> SrcRepo
+getDependencyRepo pkg repo = case M.lookup pkg $ repo_contents repo of
+  Nothing -> repo { repo_contents = M.empty }
+  Just p -> repo { repo_contents = M.insert pkg p (unions recDeps) }
+              where trueDeps = trueDepends p repo
+                    recDeps = L.map (repo_contents . (\d -> getDependencyRepo d repo)) trueDeps
+
+----------------------------------------------------------------
+--
+-- Version checking
+
+--
 -- | Find version inconsistencies in a repository
 --
 isConflicting :: SrcRepo -> Bool
