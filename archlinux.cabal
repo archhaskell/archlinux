@@ -29,3 +29,16 @@ library
     exposed-modules:
         Distribution.ArchLinux.PkgBuild
         Distribution.ArchLinux.SrcRepo
+
+executable recdeps
+    main-is: scripts/recdeps.hs
+    build-depends:
+        base >=4 && <6,
+        directory,
+        filepath,
+        containers,
+        pretty,
+        Cabal >= 1.6
+    other-modules:
+        Distribution.ArchLinux.PkgBuild
+        Distribution.ArchLinux.SrcRepo
