@@ -29,6 +29,7 @@ library
     exposed-modules:
         Distribution.ArchLinux.PkgBuild
         Distribution.ArchLinux.SrcRepo
+        Distribution.ArchLinux.CabalTranslation
 
 executable recdeps
     main-is: scripts/recdeps.hs
