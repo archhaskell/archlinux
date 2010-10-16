@@ -531,7 +531,7 @@ data ArchPackage = ArchPackage
 --
 -- | An empty package
 --
-emptyArchPkg :: PkgBuild
+emptyArchPkg :: ArchPackage
 emptyArchPkg = ArchPackage
   { archpkg_pkgbuild = emptyPkg
   , archpkg_install = Nothing
