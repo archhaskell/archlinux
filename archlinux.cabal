@@ -24,12 +24,15 @@ library
                     pretty,
                     containers,
                     directory,
-                    filepath
+                    filepath,
+                    bytestring,
+                    tar
 
     exposed-modules:
         Distribution.ArchLinux.PkgBuild
         Distribution.ArchLinux.SrcRepo
         Distribution.ArchLinux.CabalTranslation
+        Distribution.ArchLinux.HackageTranslation
 
 executable recdeps
     main-is: scripts/recdeps.hs
