@@ -27,26 +27,26 @@ import Debug.Trace
 --
 -- | Reads a tarball and converts it to a list of PackageDescription's
 --
-getCabalsFromTarball :: Bytes.ByteString -> [PackageDescription]
+getCabalsFromTarball :: Bytes.ByteString -> [GenericPackageDescription]
 getCabalsFromTarball tarball = Tar.foldEntries insertThis [] (const []) files
   where files = Tar.read tarball
         insertThis file list = case getCabalFromEntry file of
           Nothing -> list
           Just pkg -> pkg:list
         
-getCabalFromEntry :: Tar.Entry -> Maybe PackageDescription
+getCabalFromEntry :: Tar.Entry -> Maybe GenericPackageDescription
 getCabalFromEntry file = case Tar.entryContent file of
   Tar.NormalFile contents _ -> parse2maybe $ parsePackageDescription $ Bytes.unpack contents
   otherwise -> Nothing
 
 parse2maybe a = case a of
-      ParseOk _ pkg -> Just (packageDescription pkg)
+      ParseOk _ pkg -> Just pkg
       otherwise -> Nothing
 
 --
 -- | Reads a tarball and get cabal files according to a list
 --
-getSpecifiedCabalsFromTarball :: Bytes.ByteString -> [String] -> [PackageDescription]
+getSpecifiedCabalsFromTarball :: Bytes.ByteString -> [String] -> [GenericPackageDescription]
 getSpecifiedCabalsFromTarball tarball list =
   getSpecifiedCabals (mapMaybe parsePackageIdentifier list) (getCabalsFromTarball tarball)
 
@@ -64,7 +64,7 @@ parsePackageIdentifier s = case words s of
  where
   void = Debug.Trace.trace("Malformed package identifier " ++ s) Nothing
 
-getSpecifiedCabals :: [PackageIdentifier] -> [PackageDescription] -> [PackageDescription]
+getSpecifiedCabals :: [PackageIdentifier] -> [GenericPackageDescription] -> [GenericPackageDescription]
 getSpecifiedCabals list packages = filter wasSpecified packages
   where set = Set.fromList list
         wasSpecified p = Set.member (packageId p) set
