@@ -10,8 +10,11 @@ module Distribution.ArchLinux.CabalTranslation where
 -- Cabal modules
 import Distribution.Package
 import Distribution.PackageDescription
+import Distribution.PackageDescription.Configuration
 import Distribution.License
 import Distribution.Version
+import Distribution.Compiler
+import Distribution.System
 -- Archlinux modules
 import Distribution.ArchLinux.PkgBuild
 -- Standard types
@@ -24,6 +27,130 @@ import Data.Monoid
 import System.FilePath
 -- Debugging
 import Debug.Trace
+
+--
+-- | Configure package for system
+--
+preprocessCabal :: GenericPackageDescription -> Maybe PackageDescription
+preprocessCabal cabalsrc =
+     case finalizePackageDescription
+        []
+        (const True) -- could check against prefered pkgs....
+        (Platform X86_64 buildOS) -- linux/x86_64
+        (CompilerId GHC (Version [6,10,3] []))
+
+        -- now constrain it to solve in the context of a modern ghc only
+        corePackages
+        cabalsrc
+     of
+        Left deps     -> trace ("Unresolved dependencies: " ++show deps) Nothing
+        Right (pkg,_) -> Just pkg { buildDepends = removeCoreFrom (buildDepends pkg) }
+
+-- attempt to filter out core packages we've already satisified
+-- not actuall correct, since it doesn't take any version
+-- info into account.
+--
+-- TODO this should use configDependency to find the precise
+-- versions we have available on Arch.
+--
+removeCoreFrom :: [Dependency] -> [Dependency]
+removeCoreFrom []               = []
+removeCoreFrom (x@(Dependency n vr):xs) =
+  case find (\(Dependency k _) -> n == k) corePackages of
+    -- haskell-parsec, haskell-quickcheck
+    Just (Dependency _ (ThisVersion v'))
+        | withinRange v' vr         ->     removeCoreFrom xs
+
+    Just (Dependency (PackageName "base") _)
+                                    ->     removeCoreFrom xs
+
+    Just (Dependency _ AnyVersion)  ->     removeCoreFrom xs
+    _                               -> x : removeCoreFrom xs
+
+--
+-- Core packages and their versions. These come with
+-- ghc, so we should be right.
+--
+-- http://haskell.org/haskellwiki/Libraries_released_with_GHC
+--
+-- And what Arch Linux thinks GHC provides:
+--
+-- http://repos.archlinux.org/wsvn/packages/ghc/repos/extra-x86_64/PKGBUILD
+--
+-- Note: we could just list these directly, and have yaourt solve them.
+--
+-- NEW POLICY:
+--      We rely on all "provides" from the GHC library to be listed explicitly.
+--
+corePackages :: [Dependency]
+corePackages =
+    [
+
+-- Magic packages we have to remove
+     Dependency (PackageName "base")             (ThisVersion (Version  [4,1,0,0] []))
+    ,Dependency (PackageName "dph-base")           (AnyVersion)
+    ,Dependency (PackageName "dph-par" )           (AnyVersion)
+    ,Dependency (PackageName "dph-prim-interface") (AnyVersion)
+    ,Dependency (PackageName "dph-prim-par"   )    (AnyVersion)
+    ,Dependency (PackageName "dph-prim-seq"   )    (AnyVersion)
+    ,Dependency (PackageName "dph-seq"        )    (AnyVersion)
+    ,Dependency (PackageName "ghc")              (AnyVersion)
+    ,Dependency (PackageName "ghc-prim")         (AnyVersion)
+    ,Dependency (PackageName "integer")         (AnyVersion)
+    ,Dependency (PackageName "integer-gmp")         (AnyVersion)
+    ,Dependency (PackageName "ghc-binary")         (AnyVersion)
+
+-- Official Provides: http://repos.archlinux.org/wsvn/packages/ghc/repos/extra-x86_64/PKGBUILD
+--  ,Dependency (PackageName "array")            (ThisVersion (Version  [0,3,0,0] []))
+--  ,Dependency (PackageName "bytestring")       (ThisVersion (Version  [0,9,1,5] []))
+--  ,Dependency (PackageName "Cabal")            (ThisVersion (Version  [1,8,0,2] []))
+--  ,Dependency (PackageName "containers")       (ThisVersion (Version  [0,3,0,0] []))
+--  ,Dependency (PackageName "directory")        (ThisVersion (Version  [1,0,1,0] []))
+--  ,Dependency (PackageName "extensible-exceptions")         (AnyVersion)
+--  ,Dependency (PackageName "filepath")         (ThisVersion (Version  [1,1,0,3] []))
+--  ,Dependency (PackageName "haskell98")        (ThisVersion (Version  [1,0,1,1] []))
+--  ,Dependency (PackageName "hpc")              (ThisVersion (Version  [0,5,0,4] []))
+--  ,Dependency (PackageName "old-locale")       (ThisVersion (Version  [1,0,0,2] []))
+--  ,Dependency (PackageName "old-time")         (ThisVersion (Version  [1,0,0,1] []))
+--  ,Dependency (PackageName "pretty")           (ThisVersion (Version  [1,0,1,1] []))
+--  ,Dependency (PackageName "process")          (ThisVersion (Version  [1,0,1,2] []))
+--  ,Dependency (PackageName "random")           (ThisVersion (Version  [1,0,0,2] []))
+--  ,Dependency (PackageName "syb")              (ThisVersion (Version  [0,1,0,2] []))
+--  ,Dependency (PackageName "template-haskell") (ThisVersion (Version  [2,4,0,0] []))
+--  ,Dependency (PackageName "time")             (ThisVersion (Version  [1,1,4] []))
+--  ,Dependency (PackageName "unix")             (ThisVersion (Version  [2,4,0,0] []))
+--  utf8-string
+
+
+-- Removed in 6.12.x
+--  ,Dependency (PackageName "html")             (ThisVersion (Version  [1,0,1,2] []))
+--  ,Dependency (PackageName "integer")          (ThisVersion (Version  [0,1,0,0] []))
+--  ,Dependency (PackageName "QuickCheck")       (ThisVersion (Version  [1,2,0,0] []))
+--  ,Dependency (PackageName "haskell-src")      (ThisVersion (Version  [1,0,1,3] []))
+--  ,Dependency (PackageName "parsec")           (ThisVersion (Version  [2,1,0,0] []))
+--  ,Dependency (PackageName "packedstring")     (ThisVersion (Version  [0,1,0,1] []))
+--  ,Dependency (PackageName "parallel")         (ThisVersion (Version  [1,1,0,0] []))
+--  ,Dependency (PackageName "network")          (ThisVersion (Version  [2,2,0,1] []))
+--  ,Dependency (PackageName "mtl")              (ThisVersion (Version  [1,1,0,2] []))
+--  ,Dependency (PackageName "stm")              (ThisVersion (Version  [2,1,1,2] []))
+--  ,Dependency (PackageName "HUnit")            (ThisVersion (Version  [1,2,0,3] []))
+--  ,Dependency (PackageName "xhtml")            (ThisVersion (Version  [3000,2,0,1] []))
+--  ,Dependency (PackageName "regex-base")       (ThisVersion (Version  [0,72,0,2] []))
+--  ,Dependency (PackageName "regex-compat")     (ThisVersion (Version  [0,71,0,1] []))
+--  ,Dependency (PackageName "regex-posix")      (ThisVersion (Version  [0,72,0,2] []))
+
+-- Removed in 6.10.x
+--  ,Dependency (PackageName "editline")         (AnyVersion)
+--   Dependency (PackageName "ALUT")             (ThisVersion (Version  [2,1,0,0] []))
+--  ,Dependency (PackageName "cgi")              (ThisVersion (Version  [3001,1,5,1] []))
+--  ,Dependency (PackageName "fgl")              (ThisVersion (Version  [5,4,1,1] [])) -- gone
+--  ,Dependency (PackageName "GLUT")             (ThisVersion (Version  [2,1,1,1] []))
+--  ,Dependency (PackageName "OpenAL")           (ThisVersion (Version  [1,3,1,1] [])) -- gone
+--  ,Dependency (PackageName "readline")         (ThisVersion (Version  [1,0,1,0] []))
+
+    ]
+
+------------------------------------------------------------------------------------
 
 --
 -- | Translate a generic cabal file into a PGKBUILD
