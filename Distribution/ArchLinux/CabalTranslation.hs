@@ -353,6 +353,7 @@ findCLibs (PackageDescription { library = lib, executables = exe }) =
     translationTable = M.fromList
         [("Imlib2",     "imlib2")
         ,("SDL",        "sdl")
+        ,("adns",       "adns")
         ,("alut",       "freealut")
         ,("bz2",        "bzip2")
         ,("cblas",      "blas")
