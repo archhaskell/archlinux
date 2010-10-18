@@ -6,7 +6,12 @@
 -- Maintainer: Arch Haskell Team <arch-haskell@haskell.org>
 --
 
-module Distribution.ArchLinux.CabalTranslation where
+module Distribution.ArchLinux.CabalTranslation (
+         preprocessCabal,
+         cabal2pkg,
+         oldCabal2Arch,
+         install_hook_name
+       ) where
 -- Cabal modules
 import Distribution.Package
 import Distribution.PackageDescription
