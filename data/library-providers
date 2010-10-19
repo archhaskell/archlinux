@@ -1,0 +1,102 @@
+# This file lists external library dependencies and the ArchLinux
+# packages providing them. For example, if the openssl package
+# provides libssl.so, there should be a line
+#
+# ssl openssl
+#
+
+Imlib2     imlib2
+SDL        sdl
+adns       adns
+alut       freealut
+bz2        bzip2
+cblas      blas
+crack      cracklib
+crypto     openssl
+curl       curl
+freetype   freetype2
+glib       glib2
+wmflite    libwmf
+il         devil
+
+jpeg       libjpeg
+ldap       libldap
+pcap       libpcap
+png        libpng
+x11        libx11
+xrandr     libxrandr
+xml2       libxml2
+exif       libexif
+tiff       libtiff
+sndfile    libsndfile
+gcrypt     libgcrypt
+fftw3      fftw
+
+pq         postgresql
+ssl        openssl
+wx         wxgtk
+xenctrl    xen
+odbc       unixodbc
+z          zlib
+curses     ncurses
+xslt       libxslt
+csound64   csound5
+uuid       e2fsprogs
+doublefann fann
+ev         libev
+pthread    
+m          
+gl         
+glu        
+db_cxx     
+db_cxx     
+xdamage    
+
+icui18n          icu
+icuuc            icu
+icudata          icu
+
+netsnmp        net-snmp
+asound         alsa-lib
+ffi            libffi
+ogg            libogg
+theora         libtheora
+mtp            libmtp
+zmq            zeromq
+cv             opencv
+highgui        opencv
+xss            libxss
+idn            libidn
+libgsasl       gsasl
+event          libevent
+gcc_s          gcc-libs
+
+
+# subsumed into glib
+
+gobject                
+gmodule                glib2
+gio                    
+gthread                
+gnome-vfs-module       
+gstreamer-audio        
+gstreamer-base         
+gstreamer-controller   
+gstreamer-dataprotocol 
+gstreamer-net          
+ogremain          
+gnutls-extra      gnutls
+pangocairo        pango
+
+webkit      libwebkit
+gtk+        gtk
+gdk         gtk
+gdk-x11-2.0 gtk2
+gtk-x11-2.0 gtk2
+xine        xine-lib
+ncursesw    ncurses
+panel       ncurses
+
+gstreamer              gstreamer0.10
+gstreamer-plugins-base gstreamer0.10-base
+

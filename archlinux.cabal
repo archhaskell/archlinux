@@ -33,6 +33,8 @@ library
         Distribution.ArchLinux.SrcRepo
         Distribution.ArchLinux.CabalTranslation
         Distribution.ArchLinux.HackageTranslation
+    other-modules:
+        CabalTranslationData
 
 executable recdeps
     main-is: scripts/recdeps.hs
