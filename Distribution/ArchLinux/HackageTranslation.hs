@@ -13,9 +13,7 @@ import Distribution.PackageDescription
 import Distribution.PackageDescription.Parse
 -- Standard types
 import Distribution.Text
-import Data.Char
 --import Data.List
-import qualified Data.Map as M
 import qualified Data.Set as Set
 import Data.Maybe
 -- Read tarballs
@@ -37,11 +35,11 @@ getCabalsFromTarball tarball = Tar.foldEntries insertThis [] (const []) files
 getCabalFromEntry :: Tar.Entry -> Maybe GenericPackageDescription
 getCabalFromEntry file = case Tar.entryContent file of
   Tar.NormalFile contents _ -> parse2maybe $ parsePackageDescription $ Bytes.unpack contents
-  otherwise -> Nothing
+  _ -> Nothing
 
 parse2maybe a = case a of
       ParseOk _ pkg -> Just pkg
-      otherwise -> Nothing
+      _ -> Nothing
 
 --
 -- | Reads a tarball and get cabal files according to a list
@@ -60,7 +58,7 @@ parsePackageIdentifier s = case words s of
         Just v -> Just $ PackageIdentifier { pkgName = PackageName name ,
                                        pkgVersion = v }
       where ver = simpleParse version
-  otherwise -> void
+  _ -> void
  where
   void = Debug.Trace.trace("Malformed package identifier " ++ s) Nothing
 

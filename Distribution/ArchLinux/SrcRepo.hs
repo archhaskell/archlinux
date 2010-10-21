@@ -12,9 +12,7 @@ module Distribution.ArchLinux.SrcRepo where
 import Distribution.ArchLinux.PkgBuild as PkgBuild
 
 import Distribution.Package
-import Distribution.Text
 import Distribution.Version
-import Text.PrettyPrint
 
 import Data.List as L
 import Data.Map as M
@@ -38,8 +36,8 @@ data SrcRepo = SrcRepo
 --
 getPkgFromDir :: FilePath -> IO (Maybe PkgBuild)
 getPkgFromDir p = do
-  valid <- Dir.doesFileExist (p </> "PKGBUILD")
-  if valid
+  validdir <- Dir.doesFileExist (p </> "PKGBUILD")
+  if validdir
     then do
       pkg <- readFile (p </> "PKGBUILD")
       case decodePackage pkg of
