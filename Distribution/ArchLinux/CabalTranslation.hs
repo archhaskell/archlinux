@@ -22,6 +22,7 @@ import Distribution.Compiler
 import Distribution.System
 -- Archlinux modules
 import Distribution.ArchLinux.PkgBuild
+import Distribution.ArchLinux.SystemProvides
 -- Standard types
 import Distribution.Text
 import Data.Char
@@ -32,14 +33,12 @@ import Data.Monoid
 import System.FilePath
 -- Debugging
 import Debug.Trace
--- Static data
-import CabalTranslationData
 
 --
 -- | Configure package for system
 --
-preprocessCabal :: GenericPackageDescription -> Maybe PackageDescription
-preprocessCabal cabalsrc =
+preprocessCabal :: GenericPackageDescription -> SystemProvides -> Maybe PackageDescription
+preprocessCabal cabalsrc systemContext =
      case finalizePackageDescription
         []
         (const True) -- could check against prefered pkgs....
@@ -47,11 +46,11 @@ preprocessCabal cabalsrc =
         (CompilerId GHC (Version [6,10,3] []))
 
         -- now constrain it to solve in the context of a modern ghc only
-        corePackages
+        (corePackages systemContext)
         cabalsrc
      of
         Left deps     -> trace ("Unresolved dependencies: " ++show deps) Nothing
-        Right (pkg,_) -> Just pkg { buildDepends = removeCoreFrom (buildDepends pkg) }
+        Right (pkg,_) -> Just pkg { buildDepends = removeCoreFrom (buildDepends pkg) systemContext }
 
 -- attempt to filter out core packages we've already satisified
 -- not actuall correct, since it doesn't take any version
@@ -60,27 +59,27 @@ preprocessCabal cabalsrc =
 -- TODO this should use configDependency to find the precise
 -- versions we have available on Arch.
 --
-removeCoreFrom :: [Dependency] -> [Dependency]
-removeCoreFrom []               = []
-removeCoreFrom (x@(Dependency n vr):xs) =
-  case find (\(Dependency k _) -> n == k) corePackages of
+removeCoreFrom :: [Dependency] -> SystemProvides -> [Dependency]
+removeCoreFrom [] _             = []
+removeCoreFrom (x@(Dependency n vr):xs) systemContext =
+  case find (\(Dependency k _) -> n == k) $ corePackages systemContext of
     -- haskell-parsec, haskell-quickcheck
     Just (Dependency _ (ThisVersion v'))
-        | withinRange v' vr         ->     removeCoreFrom xs
+        | withinRange v' vr         ->     removeCoreFrom xs systemContext
 
     Just (Dependency (PackageName "base") _)
-                                    ->     removeCoreFrom xs
+                                    ->     removeCoreFrom xs systemContext
 
-    Just (Dependency _ AnyVersion)  ->     removeCoreFrom xs
-    _                               -> x : removeCoreFrom xs
+    Just (Dependency _ AnyVersion)  ->     removeCoreFrom xs systemContext
+    _                               -> x : removeCoreFrom xs systemContext
 
 ------------------------------------------------------------------------------------
 
 --
 -- | Translate a generic cabal file into a PGKBUILD
 --
-cabal2pkg :: PackageDescription -> (PkgBuild, Maybe String)
-cabal2pkg cabal
+cabal2pkg :: PackageDescription -> SystemProvides -> (PkgBuild, Maybe String)
+cabal2pkg cabal systemContext
 
 -- TODO decide if it's a library or an executable,
 -- handle multipackages
@@ -168,7 +167,7 @@ cabal2pkg cabal
     anyClibraries | null libs = ArchList []
                   | otherwise = ArchList libs
        where
-         libs = [ ArchDep (Dependency (PackageName s) AnyVersion) | s <- nub (findCLibs cabal) ]
+         libs = [ ArchDep (Dependency (PackageName s) AnyVersion) | s <- nub (findCLibs cabal systemContext) ]
 
 (<->) :: String -> String -> String
 x <-> y = x ++ "-" ++ y
@@ -254,8 +253,8 @@ install_hook pkgname = unlines
     , "shift"
     , "$op $*" ]
 
-findCLibs :: PackageDescription -> [String]
-findCLibs (PackageDescription { library = lib, executables = exe }) =
+findCLibs :: PackageDescription -> SystemProvides -> [String]
+findCLibs (PackageDescription { library = lib, executables = exe }) sysContext =
     -- warn for packages not in list.
     filter (not . null) $ map (canonicalise . map toLower) (some ++ rest)
   where
@@ -269,7 +268,7 @@ findCLibs (PackageDescription { library = lib, executables = exe }) =
                                         else n)
                                         (pkgconfigDepends (libBuildInfo l))
 
-    canonicalise k = case M.lookup k translationTable of
+    canonicalise k = case M.lookup k (translationTable sysContext) of
         Nothing -> trace ("WARNING: this library depends on a C library we do not know the pacman name for (" ++ map toLower k ++ ") . Check the C library names in the generated PKGBUILD File") $ map toLower k
         Just s  -> s
 
