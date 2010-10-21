@@ -87,12 +87,9 @@ cabal2pkg cabal
 -- extract C dependencies
 
 -- = trace (show cabal) $
-  =
-  (emptyPkgBuild
-    { arch_pkgname = archName
+  = ( stub {
+      arch_pkgname = archName
     , arch_pkgver  = vers
-    , arch_url     = "http://hackage.haskell.org/package/"++display name
- --       else homepage cabal
     , arch_pkgdesc = case synopsis cabal of
                           [] -> take 80 (description cabal)
                           s  -> s
@@ -102,80 +99,37 @@ cabal2pkg cabal
                 x@GPL {} -> x
                 x@LGPL {} -> x
                 l    -> UnknownLicense ("custom:"++ show l)
-
-    -- All Hackage packages depend on GHC at build time
-    -- All Haskell libraries are prefixed with "haskell-"
-    , arch_makedepends = if not hasLibrary
-            then my_makedepends
-            else ArchList [] -- makedepends should not duplicate depends
-
-    , arch_depends =
-        (if not (isLibrary)
-            then
-                ArchList [ArchDep (Dependency (PackageName "gmp") AnyVersion)]
-                                `mappend`
-                                anyClibraries
-            else ArchList [])
-        `mappend`
-            -- libraries have 'register-time' dependencies on
-            -- their dependent Haskell libraries.
-            --
-           (if hasLibrary then my_makedepends
-                          else ArchList [])
-
-    -- need the dependencies of all flags that are on by default, for all libraries and executables
-
-    -- Hackage programs only need their own source to build
-    , arch_source  = ArchList . return $
-          "http://hackage.haskell.org/packages/archive/"
-       ++ (display name </> display vers </> display name <-> display vers <.> "tar.gz")
-
-    , arch_build =
-        [ "cd ${srcdir}/" </> display name <-> display vers
-        , "runhaskell Setup configure --prefix=/usr --docdir=/usr/share/doc/${pkgname}"
-        , "runhaskell Setup build"
-        ] ++
-
-    -- Only needed for libraries:
-        (if hasLibrary
-           then
-            [ "runhaskell Setup haddock"
-            , "runhaskell Setup register   --gen-script"
-            , "runhaskell Setup unregister --gen-script"
-            ]
-           else [])
-
-    , arch_package =
-        [ "cd ${srcdir}/" </> display name <-> display vers ] ++
-        -- Only needed for libraries:
-        (if hasLibrary
-           then
-            [ "install -D -m744 register.sh   ${pkgdir}/usr/share/haskell/${pkgname}/register.sh"
-            , "install    -m744 unregister.sh ${pkgdir}/usr/share/haskell/${pkgname}/unregister.sh"
-            , "install -d -m755 ${pkgdir}/usr/share/doc/ghc/html/libraries"
-            , "ln -s /usr/share/doc/${pkgname}/html ${pkgdir}/usr/share/doc/ghc/html/libraries/" ++ (display name)
-            ]
-           else [])
-         ++
-         ["runhaskell Setup copy --destdir=${pkgdir}"]
-         ++
+    , arch_package = (arch_package stub) ++
          (if not (null (licenseFile cabal)) && (case license cabal of GPL {} -> False; LGPL {} -> False; _ -> True)
           then
               [ "install -D -m644 " ++ licenseFile cabal ++ " ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
               , "rm -f ${pkgdir}/usr/share/doc/${pkgname}/LICENSE"
               ]
           else [])
-
-    -- if its a library:
-    , arch_install = if hasLibrary then Just $ install_hook_name archName
-                                   else Nothing
-
     }, if hasLibrary
           then Just (install_hook archName)
           else Nothing
     )
 
   where
+    stub = if hasLibrary
+               then (stubPackageLibrary $ display name) {
+                 arch_depends = (
+                   if not (isLibrary)
+                   then ArchList [ArchDep (Dependency (PackageName "gmp") AnyVersion)]
+                        `mappend` anyClibraries
+            -- libraries have 'register-time' dependencies on
+            -- their dependent Haskell libraries.
+            --
+                   else ArchList []) `mappend` my_makedepends
+                 }
+               else (stubPackageProgram $ display name) {
+                 -- isLibrary = False automatically
+                 arch_makedepends = my_makedepends
+               , arch_depends = ArchList [ArchDep (Dependency (PackageName "gmp") AnyVersion)]
+                                `mappend` anyClibraries
+               }
+
     archName = map toLower (if isLibrary then "haskell-" ++ display name else display name)
     name     = pkgName (package cabal)
     vers     = pkgVersion (package cabal)
@@ -218,6 +172,57 @@ cabal2pkg cabal
 
 (<->) :: String -> String -> String
 x <-> y = x ++ "-" ++ y
+
+--
+-- | A PKGBUILD skeleton for Haskell libraries (hasLibrary = True)
+--
+stubPackageLibrary :: String -> PkgBuild
+stubPackageLibrary hkgname = emptyPkgBuild {
+      arch_url     = "http://hackage.haskell.org/package/" ++ hkgname
+    -- All Hackage packages depend on GHC at build time
+    -- All Haskell libraries are prefixed with "haskell-"
+    , arch_makedepends = ArchList [] -- makedepends should not duplicate depends
+    -- Hackage programs only need their own source to build
+    , arch_source  = ArchList . return $
+          "http://hackage.haskell.org/packages/archive/" ++ hkgname ++ "/${pkgver}/" ++ hkgname ++ "-${pkgver}.tar.gz"
+    , arch_build =
+        [ "cd ${srcdir}/" ++ hkgname ++ "-${pkgver}"
+        , "runhaskell Setup configure --prefix=/usr --docdir=/usr/share/doc/${pkgname}"
+        , "runhaskell Setup build"
+            , "runhaskell Setup haddock"
+            , "runhaskell Setup register   --gen-script"
+            , "runhaskell Setup unregister --gen-script"
+            ]
+    , arch_package =
+        [ "cd ${srcdir}/" ++ hkgname ++ "-${pkgver}"
+            , "install -D -m744 register.sh   ${pkgdir}/usr/share/haskell/${pkgname}/register.sh"
+            , "install    -m744 unregister.sh ${pkgdir}/usr/share/haskell/${pkgname}/unregister.sh"
+            , "install -d -m755 ${pkgdir}/usr/share/doc/ghc/html/libraries"
+            , "ln -s /usr/share/doc/${pkgname}/html ${pkgdir}/usr/share/doc/ghc/html/libraries/" ++ hkgname
+         ,"runhaskell Setup copy --destdir=${pkgdir}"]
+    -- if its a library:
+    , arch_install = Just "${pkgname}.install"
+    }
+
+--
+-- | A PKGBUILD skeleton for Haskell programs (hasLibrary = False)
+--
+stubPackageProgram :: String -> PkgBuild
+stubPackageProgram hkgname = emptyPkgBuild {
+      arch_url     = "http://hackage.haskell.org/package/" ++ hkgname
+    -- Hackage programs only need their own source to build
+    , arch_source  = ArchList . return $
+          "http://hackage.haskell.org/packages/archive/" ++ hkgname ++ "/${pkgver}/" ++ hkgname ++ "-${pkgver}.tar.gz"
+    , arch_build =
+        [ "cd ${srcdir}/" ++ hkgname ++ "-${pkgver}"
+        , "runhaskell Setup configure --prefix=/usr --docdir=/usr/share/doc/${pkgname}"
+        , "runhaskell Setup build"
+        ]
+    , arch_package =
+        [ "cd ${srcdir}/" ++ hkgname ++ "-${pkgver}"
+        , "runhaskell Setup copy --destdir=${pkgdir}"]
+    , arch_install = Nothing
+    }
 
 --
 -- post install, and pre-remove hooks to run, to sync up ghc-pkg
