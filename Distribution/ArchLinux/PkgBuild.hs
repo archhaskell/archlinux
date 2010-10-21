@@ -463,10 +463,10 @@ rawpkg2doc :: PkgBuild -> Doc
 rawpkg2doc pkg = vcat
  [ text "pkgname"
     <=> text (arch_pkgname pkg)
- , text "pkgrel"
-    <=> int (arch_pkgrel pkg)
  , text "pkgver"
     <=> disp (arch_pkgver pkg)
+ , text "pkgrel"
+    <=> int (arch_pkgrel pkg)
  , text "pkgdesc"
     <=> text (show (arch_pkgdesc pkg))
  , text "url"
