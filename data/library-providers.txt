@@ -37,14 +37,11 @@ fftw3      fftw
 pq         postgresql
 ssl        openssl
 wx         wxgtk
-xenctrl    xen
 odbc       unixodbc
 z          zlib
 curses     ncurses
 xslt       libxslt
-csound64   csound5
 uuid       e2fsprogs
-doublefann fann
 ev         libev
 pthread    glibc
 m          glibc
@@ -52,6 +49,7 @@ gl         libgl
 glu        mesa
 glut       freeglut
 db_cxx     db
+sqlite3    sqlite3
 xdamage    libxdamage
 
 icui18n          icu
@@ -64,7 +62,6 @@ ffi            libffi
 ogg            libogg
 theora         libtheora
 mtp            libmtp
-zmq            zeromq
 cv             opencv
 highgui        opencv
 xss            libxss
@@ -96,6 +93,7 @@ gtk+        gtk
 gdk         gtk
 gdk-x11-2.0 gtk2
 gtk-x11-2.0 gtk2
+vte         vte
 xine        xine-lib
 ncurses     ncurses
 ncursesw    ncurses
@@ -103,3 +101,9 @@ panel       ncurses
 
 gstreamer              gstreamer0.10
 gstreamer-plugins-base gstreamer0.10-base
+
+# Packages from AUR
+xenctrl    xen
+csound64   csound5
+doublefann fann
+zmq        zeromq
