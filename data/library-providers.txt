@@ -44,13 +44,13 @@ csound64   csound5
 uuid       e2fsprogs
 doublefann fann
 ev         libev
-pthread    
-m          
-gl         
-glu        
-db_cxx     
-db_cxx     
-xdamage    
+pthread
+m
+gl
+glu
+db_cxx
+db_cxx
+xdamage
 
 icui18n          icu
 icuuc            icu
@@ -74,17 +74,17 @@ gcc_s          gcc-libs
 
 # subsumed into glib
 
-gobject                
+gobject
 gmodule                glib2
-gio                    
-gthread                
-gnome-vfs-module       
-gstreamer-audio        
-gstreamer-base         
-gstreamer-controller   
-gstreamer-dataprotocol 
-gstreamer-net          
-ogremain          
+gio
+gthread
+gnome-vfs-module
+gstreamer-audio
+gstreamer-base
+gstreamer-controller
+gstreamer-dataprotocol
+gstreamer-net
+ogremain
 gnutls-extra      gnutls
 pangocairo        pango
 
@@ -99,4 +99,3 @@ panel       ncurses
 
 gstreamer              gstreamer0.10
 gstreamer-plugins-base gstreamer0.10-base
-

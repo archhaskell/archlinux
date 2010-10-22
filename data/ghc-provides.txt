@@ -21,10 +21,10 @@ dph-prim-interface
 dph-prim-par
 dph-prim-seq
 dph-seq
-ghc    
+ghc
 ghc-prim
 integer
-integer-gmp 
+integer-gmp
 ghc-binary
 
 ## Official Provides: http://repos.archlinux.org/wsvn/packages/ghc/repos/extra-x86_64/PKGBUILD
@@ -47,8 +47,8 @@ ghc-binary
 # time==1.1.4
 # unix==2.4.0.0
 ## utf8-string
-# 
-# 
+#
+#
 ## Removed in 6.12.x
 # html==1.0.1.2
 # integer==0.1.0.0
@@ -65,7 +65,7 @@ ghc-binary
 # regex-base==0.72.0.2
 # regex-compat==0.71.0.1
 # regex-posix==0.72.0.2
-# 
+#
 ## Removed in 6.10.x
 # editline
 # ALUT==2.1.0.0
@@ -74,4 +74,3 @@ ghc-binary
 # GLUT==2.1.1.1
 # OpenAL==1.3.1.1 -- gone
 # readline==1.0.1.0
-
