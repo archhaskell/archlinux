@@ -30,6 +30,8 @@ exif       libexif
 tiff       libtiff
 sndfile    libsndfile
 gcrypt     libgcrypt
+gnutls     gnutls
+gnutls-extra      gnutls
 fftw3      fftw
 
 pq         postgresql
@@ -44,8 +46,8 @@ csound64   csound5
 uuid       e2fsprogs
 doublefann fann
 ev         libev
-pthread
-m
+pthread    glibc
+m          glibc
 gl         libgl
 glu        mesa
 glut       freeglut
@@ -70,30 +72,32 @@ idn            libidn
 libgsasl       gsasl
 event          libevent
 gcc_s          gcc-libs
-
+stdc++         gcc-libs
 
 # subsumed into glib
 
 gobject                glib2
 gmodule                glib2
 gio                    glib2
-gthread
+gthread                glib
 gnome-vfs-module
-gstreamer-audio
-gstreamer-base
-gstreamer-controller
-gstreamer-dataprotocol
-gstreamer-net
+gstreamer-audio        gstreamer0.10-base
+gstreamer-base         gstreamer0.10
+gstreamer-controller   gstreamer0.10
+gstreamer-dataprotocol gstreamer0.10
+gstreamer-net          gstreamer0.10
 ogremain
-gnutls-extra      gnutls
-pangocairo        pango
 
 webkit      libwebkit
+cairo       cairo
+pango       pango
+pangocairo  pango
 gtk+        gtk
 gdk         gtk
 gdk-x11-2.0 gtk2
 gtk-x11-2.0 gtk2
 xine        xine-lib
+ncurses     ncurses
 ncursesw    ncurses
 panel       ncurses
 
