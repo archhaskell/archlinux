@@ -82,3 +82,10 @@ getVersionConflicts packages sysProvides = concat $ map conflicts cabals
                                                  Nothing -> True
                                                  Just v -> v `withinRange` range
         conflicts p = map (\d -> (p,d)) $ filter (not . issatisfied) (buildDepends p)
+
+--
+-- | Returns the latest versions
+--
+getLatestVersions :: [GenericPackageDescription] -> M.Map PackageName Version
+getLatestVersions packages = M.fromListWith max versions
+  where versions = map (\p -> (pkgName $ packageId p, pkgVersion $ packageId p)) packages
