@@ -191,7 +191,7 @@ instance Text ArchOptions where
 
 instance Text ArchDep where
   disp (ArchDep (Dependency name ver)) =
-    text (display name) <> mydisp ver
+    text (display name) <> mydisp (simplifyVersionRange ver)
    where
      --  >= (greater than or equal to), <= (less than or
      --  equal to), = (equal to), > (greater than), or <
