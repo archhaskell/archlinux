@@ -7,13 +7,16 @@
 --
 
 module Distribution.ArchLinux.HackageTranslation where
+import Distribution.ArchLinux.CabalTranslation
+import Distribution.ArchLinux.SystemProvides
 -- Cabal modules
 import Distribution.Package
+import Distribution.Version
 import Distribution.PackageDescription
 import Distribution.PackageDescription.Parse
 -- Standard types
 import Distribution.Text
---import Data.List
+import qualified Data.Map as M
 import qualified Data.Set as Set
 import Data.Maybe
 -- Read tarballs
@@ -66,3 +69,16 @@ getSpecifiedCabals :: [PackageIdentifier] -> [GenericPackageDescription] -> [Gen
 getSpecifiedCabals list packages = filter wasSpecified packages
   where set = Set.fromList list
         wasSpecified p = Set.member (packageId p) set
+
+--
+-- | Check for inconsistencies in version requirements
+-- returns a list of pairs (package, conflicting dep).
+--
+getVersionConflicts :: [GenericPackageDescription] -> SystemProvides -> [(PackageDescription, Dependency)]
+getVersionConflicts packages sysProvides = concat $ map conflicts cabals
+  where cabals = mapMaybe (\p -> preprocessCabal p sysProvides) packages
+        versions = M.fromList $ map (\p -> (pkgName $ packageId p, pkgVersion $ packageId p)) cabals
+        issatisfied d@(Dependency pkg range) = case M.lookup pkg versions of
+                                                 Nothing -> True
+                                                 Just v -> v `withinRange` range
+        conflicts p = map (\d -> (p,d)) $ filter (not . issatisfied) (buildDepends p)
