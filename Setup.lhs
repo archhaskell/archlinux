@@ -15,8 +15,8 @@ from data/library-providers and data/ghc-provides
 
 > autogenLists :: Args -> BuildFlags -> IO HookedBuildInfo
 > autogenLists _ _ = do
->   f1 <- readFile ("data" </> "ghc-provides")
->   f2 <- readFile ("data" </> "library-providers")
+>   f1 <- readFile ("data" </> "ghc-provides.txt")
+>   f2 <- readFile ("data" </> "library-providers.txt")
 >   let modulefile = unlines [ moduleHeader, corePackages f1, translationTable f2 ]
 >   _ <- createDirectoryIfMissing True autogenFilePath
 >   writeFile (autogenFilePath </> "CabalTranslationData.hs") modulefile

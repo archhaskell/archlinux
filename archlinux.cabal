@@ -13,6 +13,7 @@ description:    Support for working with Arch Linux packages.
 build-type:     Simple
 stability:      stable
 cabal-version:  >= 1.8
+data-files:     data/*.txt
 
 source-repository head
   type:         git
@@ -33,6 +34,7 @@ library
         Distribution.ArchLinux.SrcRepo
         Distribution.ArchLinux.CabalTranslation
         Distribution.ArchLinux.HackageTranslation
+        Distribution.ArchLinux.SystemProvides
     other-modules:
         CabalTranslationData
 
