@@ -46,11 +46,11 @@ doublefann fann
 ev         libev
 pthread
 m
-gl
-glu
-db_cxx
-db_cxx
-xdamage
+gl         libgl
+glu        mesa
+glut       freeglut
+db_cxx     db
+xdamage    libxdamage
 
 icui18n          icu
 icuuc            icu
@@ -74,9 +74,9 @@ gcc_s          gcc-libs
 
 # subsumed into glib
 
-gobject
+gobject                glib2
 gmodule                glib2
-gio
+gio                    glib2
 gthread
 gnome-vfs-module
 gstreamer-audio
