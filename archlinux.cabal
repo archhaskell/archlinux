@@ -35,6 +35,8 @@ library
         Distribution.ArchLinux.CabalTranslation
         Distribution.ArchLinux.HackageTranslation
         Distribution.ArchLinux.SystemProvides
+    other-modules:
+        Paths_archlinux
 
 executable recdeps
     main-is: scripts/recdeps.hs
