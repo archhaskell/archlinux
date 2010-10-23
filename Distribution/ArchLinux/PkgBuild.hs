@@ -155,16 +155,8 @@ emptyPkgBuild =
     , arch_arch        = ArchList [Arch_X86, Arch_X86_64]
     , arch_url         = homepage e
     , arch_license     = ArchList [license e]
-
-    -- everything depends on ghc and Cabal 1.4.x
-    , arch_makedepends = ArchList
-        [(ArchDep (Dependency (PackageName "ghc")    AnyVersion))
-        ,(ArchDep (Dependency (PackageName "haskell-cabal") AnyVersion))
---        ,(ArchDep (Dependency "haskell-cabal" (LaterVersion (Version  [1,4,0,0] []))))
-        ]
-
-        -- makedepends=('ghc>=6.6') ?
     , arch_depends     = ArchList []
+    , arch_makedepends = ArchList []
     , arch_source      = ArchList []
     , arch_md5sum      = ArchList []
         -- sha1sums=('a08670e4c749850714205f425cb460ed5a0a56b2')

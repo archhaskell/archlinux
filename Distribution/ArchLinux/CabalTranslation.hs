@@ -135,7 +135,9 @@ cabal2pkg cabal systemContext
 
     -- build time dependencies
     my_makedepends =
-     (arch_makedepends emptyPkgBuild)
+      -- everything depends on ghc and Cabal 1.4.x
+     ArchList
+        [(ArchDep (Dependency (PackageName "ghc")    AnyVersion))]
         `mappend`
      -- Haskell libraries
      -- TODO: use a real package spec to compute these names
