@@ -12,7 +12,7 @@ import System.Environment
 import Control.Monad
 
 main = do
-  [pkg] <- getArgs
+  pkg <- getArgs
   dot <- getCurrentDirectory
   repo <- getRepoFromDir dot
   case repo of

@@ -131,18 +131,18 @@ getDependencyRepo pkg repo = case M.lookup pkg $ repo_contents repo of
                     recDeps = L.map (repo_contents . (\d -> getDependencyRepo d repo)) trueDeps
 
 --
--- | Output reverse dependencies of a package in topological order
+-- | Output reverse dependencies of a list of packages in topological order
 --
-getReverseDependencies :: String -> SrcRepo -> [String]
+getReverseDependencies :: [String] -> SrcRepo -> [String]
 getReverseDependencies pkg repo = dumpContentsTopo $ getReverseDependencyRepo pkg repo
 
 --
--- | Extract reverse dependencies of a package
+-- | Extract reverse dependencies of a list of packages
 --
-getReverseDependencyRepo :: String -> SrcRepo -> SrcRepo
-getReverseDependencyRepo pkg repo = repo { repo_contents = revdeps }
+getReverseDependencyRepo :: [String] -> SrcRepo -> SrcRepo
+getReverseDependencyRepo pkgs repo = repo { repo_contents = revdeps }
   where revdeps = M.filterWithKey (isarevdep) (repo_contents repo)
-        isarevdep k _ = M.member pkg (repo_contents $ getDependencyRepo k repo)
+        isarevdep k _ = or $ L.map (\p -> M.member p (repo_contents $ getDependencyRepo k repo)) pkgs
 
 ----------------------------------------------------------------
 --
