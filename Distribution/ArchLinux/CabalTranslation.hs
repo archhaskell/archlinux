@@ -25,6 +25,7 @@ import Distribution.ArchLinux.PkgBuild
 import Distribution.ArchLinux.SystemProvides
 -- Standard types
 import Distribution.Text
+import Text.PrettyPrint
 import Data.Char
 import Data.List
 import qualified Data.Map as M
@@ -78,7 +79,7 @@ removeCoreFrom (x@(Dependency n vr):xs) systemContext =
 --
 -- | Translate a generic cabal file into a PGKBUILD
 --
-cabal2pkg :: PackageDescription -> SystemProvides -> (PkgBuild, Maybe String)
+cabal2pkg :: PackageDescription -> SystemProvides -> (AnnotatedPkgBuild, Maybe String)
 cabal2pkg cabal systemContext
 
 -- TODO decide if it's a library or an executable,
@@ -86,7 +87,10 @@ cabal2pkg cabal systemContext
 -- extract C dependencies
 
 -- = trace (show cabal) $
-  = ( stub {
+  = ( emptyPkg {
+      pkgHeader = comment
+    , hkgName = display name
+    , pkgBody = stub {
       arch_pkgname = archName
     , arch_pkgver  = vers
     , arch_pkgdesc = case synopsis cabal of
@@ -104,7 +108,7 @@ cabal2pkg cabal systemContext
               [ "install -D -m644 " ++ licenseFile cabal ++ " ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
               , "rm -f ${pkgdir}/usr/share/doc/${pkgname}/LICENSE"
               ]
-          else [])
+          else []) }
     }, if hasLibrary
           then Just (install_hook archName)
           else Nothing
@@ -173,6 +177,14 @@ cabal2pkg cabal systemContext
 
 (<->) :: String -> String -> String
 x <-> y = x ++ "-" ++ y
+
+comment :: String
+comment = render $ vcat
+ [ text "# Note: we list all package dependencies."
+ , text "# Your package tool should understand 'provides' syntax"
+ , text "#"
+ , text "# Keep up to date on http://archhaskell.wordpress.com/"
+ , text "#"]
 
 --
 -- | A PKGBUILD skeleton for Haskell libraries (hasLibrary = True)
