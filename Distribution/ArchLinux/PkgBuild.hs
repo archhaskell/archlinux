@@ -178,39 +178,32 @@ instance Text ArchOptions where
   disp Strip = text "strip"
   parse = undefined
 
--- the PKGBUILD version spec is less expressive than cabal, we can't
--- really handle unions or intersections well yet.
+-- the PKGBUILD version spec is less expressive than cabal, we can
+-- only handle simple intervals like (0,v) or (v,+infty)
+mydisp :: VersionInterval -> Doc
+mydisp (LowerBound v InclusiveBound, NoUpperBound) = if v==zeroVersion then empty else text ">=" <> disp v
+mydisp (LowerBound v ExclusiveBound, NoUpperBound) = text ">" <> disp v
+mydisp x@(lower, UpperBound v boundType) = maybeWarn (text symbol <> disp v)
+  where maybeWarn = if lower == LowerBound zeroVersion InclusiveBound then id
+                    else trace ("WARNING: arbitrary version interval requirements are unsupported, using <" ++ display v ++ " instead.")
+        symbol = if boundType == InclusiveBound then "<=" else "<"
+
+zeroVersion = Version [0] []
 
 instance Text ArchDep where
   disp (ArchDep (Dependency name ver)) =
-    text (display name) <> mydisp (simplifyVersionRange ver)
+    disp name <> mydisp2 intervals
    where
+      intervals = asVersionIntervals ver
+      strName = display name
      --  >= (greater than or equal to), <= (less than or
      --  equal to), = (equal to), > (greater than), or <
-      mydisp AnyVersion           = empty
-
-      mydisp (ThisVersion    v)   = text "=" <> disp v
-      mydisp (LaterVersion   v)   = char '>' <> disp v
-      mydisp (EarlierVersion v)   = char '<' <> disp v
-
-      mydisp (UnionVersionRanges (ThisVersion  v1) (LaterVersion v2))
-        | v1 == v2 = text ">=" <> disp v1
-      mydisp (UnionVersionRanges (LaterVersion v2) (ThisVersion  v1))
-        | v1 == v2 = text ">=" <> disp v1
-      mydisp (UnionVersionRanges (ThisVersion v1) (EarlierVersion v2))
-        | v1 == v2 = text "<=" <> disp v1
-      mydisp (UnionVersionRanges (EarlierVersion v2) (ThisVersion v1))
-        | v1 == v2 = text "<=" <> disp v1
-
-{-
-      mydisp (UnionVersionRanges r1 r2)
-        = disp r1 <+> text "||" <+> disp r2
-
-      mydisp (IntersectVersionRanges r1 r2)
-        = disp r1 <+> text "&&" <+> disp r2
--}
-
-      mydisp x = trace ("WARNING: Can't handle this version format yet: " ++ show x ++ "\ncheck the dependencies by hand.")$ empty
+      mydisp2 l | l == []      = trace ("WARNING: version requirement for " ++
+                                   strName ++ " is logically impossible.") empty
+                | tail l == [] = mydisp $ head l
+                -- If there are multiple possible ranges, take only latest versions
+                | otherwise    = trace ("WARNING: multiple version ranges specified for " ++
+                                        strName ++ " using only the last one.") $ mydisp $ last l
 
   parse = undefined
 
@@ -432,7 +425,7 @@ readDepends s =
 -- TODO : read version spec
 str2archdep :: String -> ArchDep
 str2archdep s = case v of
-    Nothing -> ArchDep (Dependency (PackageName name) AnyVersion)
+    Nothing -> ArchDep (Dependency (PackageName name) anyVersion)
     Just w -> ArchDep (Dependency (PackageName name) w)
   where name = takeWhile (\x -> x `notElem` "<=>") s
         vspec = dropWhile (\x -> x `notElem` "<=>") s
