@@ -200,19 +200,19 @@ stubPackageLibrary hkgname = emptyPkgBuild {
           "http://hackage.haskell.org/packages/archive/" ++ hkgname ++ "/${pkgver}/" ++ hkgname ++ "-${pkgver}.tar.gz"
     , arch_build =
         [ "cd ${srcdir}/" ++ hkgname ++ "-${pkgver}"
-        , "runhaskell Setup configure --prefix=/usr --docdir=/usr/share/doc/${pkgname}"
+        , "runhaskell Setup configure --prefix=/usr --docdir=/usr/share/doc/${pkgname} -O --enable-split-objs --enable-shared"
         , "runhaskell Setup build"
-            , "runhaskell Setup haddock"
-            , "runhaskell Setup register   --gen-script"
-            , "runhaskell Setup unregister --gen-script"
-            ]
+        , "runhaskell Setup haddock"
+        , "runhaskell Setup register   --gen-script"
+        , "runhaskell Setup unregister --gen-script"
+        ]
     , arch_package =
         [ "cd ${srcdir}/" ++ hkgname ++ "-${pkgver}"
-            , "install -D -m744 register.sh   ${pkgdir}/usr/share/haskell/${pkgname}/register.sh"
-            , "install    -m744 unregister.sh ${pkgdir}/usr/share/haskell/${pkgname}/unregister.sh"
-            , "install -d -m755 ${pkgdir}/usr/share/doc/ghc/html/libraries"
-            , "ln -s /usr/share/doc/${pkgname}/html ${pkgdir}/usr/share/doc/ghc/html/libraries/" ++ hkgname
-         ,"runhaskell Setup copy --destdir=${pkgdir}"]
+        , "install -D -m744 register.sh   ${pkgdir}/usr/share/haskell/${pkgname}/register.sh"
+        , "install    -m744 unregister.sh ${pkgdir}/usr/share/haskell/${pkgname}/unregister.sh"
+        , "install -d -m755 ${pkgdir}/usr/share/doc/ghc/html/libraries"
+        , "ln -s /usr/share/doc/${pkgname}/html ${pkgdir}/usr/share/doc/ghc/html/libraries/" ++ hkgname
+        ,"runhaskell Setup copy --destdir=${pkgdir}"]
     -- if its a library:
     , arch_install = Just "${pkgname}.install"
     }
