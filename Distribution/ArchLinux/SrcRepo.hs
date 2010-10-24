@@ -60,6 +60,7 @@ getRepoFromDir path = do
       return (Just result)
     else return Nothing
 
+insertpkg :: Map String PkgBuild -> FilePath -> IO (Map String PkgBuild)
 insertpkg m dir = do
   pkg <- getPkgFromDir dir
   case pkg of
