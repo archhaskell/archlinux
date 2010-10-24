@@ -63,7 +63,7 @@ parsePackageIdentifier s = case words s of
       where ver = simpleParse version
   _ -> void
  where
-  void = Debug.Trace.trace("Malformed package identifier " ++ s) Nothing
+  void = Debug.Trace.trace("Malformed package identifier " ++ show s) Nothing
 
 getSpecifiedCabals :: [PackageIdentifier] -> [GenericPackageDescription] -> [GenericPackageDescription]
 getSpecifiedCabals list packages = filter wasSpecified packages
