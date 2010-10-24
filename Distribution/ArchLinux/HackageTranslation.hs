@@ -34,7 +34,7 @@ getCabalsFromTarball tarball = Tar.foldEntries insertThis [] (const []) files
         insertThis file list = case getCabalFromEntry file of
           Nothing -> list
           Just pkg -> pkg:list
-        
+
 getCabalFromEntry :: Tar.Entry -> Maybe GenericPackageDescription
 getCabalFromEntry file = case Tar.entryContent file of
   Tar.NormalFile contents _ -> parse2maybe $ parsePackageDescription $ Bytes.unpack contents
