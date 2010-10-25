@@ -29,13 +29,11 @@ import Distribution.License
 import Text.PrettyPrint
 import Data.List
 import Data.Monoid
-import Data.Maybe
 import Debug.Trace
 
 import Control.Monad
 import Control.Monad.Instances
 import Data.Char
-import Numeric
 
 
 --
