@@ -200,7 +200,7 @@ stubPackageLibrary hkgname = emptyPkgBuild {
           "http://hackage.haskell.org/packages/archive/" ++ hkgname ++ "/${pkgver}/" ++ hkgname ++ "-${pkgver}.tar.gz"
     , arch_build =
         [ "cd ${srcdir}/" ++ hkgname ++ "-${pkgver}"
-        , "runhaskell Setup configure --prefix=/usr --docdir=/usr/share/doc/${pkgname} -O --enable-split-objs --enable-shared"
+        , "runhaskell Setup configure --prefix=/usr --docdir=/usr/share/doc/${pkgname} -O --enable-split-objs"
         , "runhaskell Setup build"
         , "runhaskell Setup haddock"
         , "runhaskell Setup register   --gen-script"
