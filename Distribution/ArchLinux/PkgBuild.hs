@@ -182,11 +182,12 @@ instance Text ArchOptions where
 mydisp :: VersionInterval -> Doc
 mydisp (LowerBound v InclusiveBound, NoUpperBound) = if v==zeroVersion then empty else text ">=" <> disp v
 mydisp (LowerBound v ExclusiveBound, NoUpperBound) = text ">" <> disp v
-mydisp x@(lower, UpperBound v boundType) = maybeWarn (text symbol <> disp v)
+mydisp (lower, UpperBound v boundType) = maybeWarn (text symbol <> disp v)
   where maybeWarn = if lower == LowerBound zeroVersion InclusiveBound then id
                     else trace ("WARNING: arbitrary version interval requirements are unsupported, using <" ++ display v ++ " instead.")
         symbol = if boundType == InclusiveBound then "<=" else "<"
 
+zeroVersion :: Version
 zeroVersion = Version [0] []
 
 instance Text ArchDep where
@@ -210,7 +211,7 @@ instance Text ArchDep where
 -- | Extract just the package name from ArchDep
 --
 pkgnameFromArchDep :: ArchDep -> String
-pkgnameFromArchDep (ArchDep (Dependency (PackageName p) v)) = p
+pkgnameFromArchDep (ArchDep (Dependency (PackageName p) _)) = p
 
 --
 -- | Valid linux platforms
