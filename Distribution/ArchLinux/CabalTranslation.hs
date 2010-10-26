@@ -228,7 +228,7 @@ stubPackageProgram hkgname = emptyPkgBuild {
           "http://hackage.haskell.org/packages/archive/" ++ hkgname ++ "/${pkgver}/" ++ hkgname ++ "-${pkgver}.tar.gz"
     , arch_build =
         [ "cd ${srcdir}/" ++ hkgname ++ "-${pkgver}"
-        , "runhaskell Setup configure --prefix=/usr --docdir=/usr/share/doc/${pkgname}"
+        , "runhaskell Setup configure --prefix=/usr --docdir=/usr/share/doc/${pkgname} -O"
         , "runhaskell Setup build"
         ]
     , arch_package =
