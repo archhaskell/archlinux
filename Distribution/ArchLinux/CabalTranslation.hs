@@ -262,10 +262,7 @@ install_hook pkgname = unlines
     , "}"
     , "post_remove() {"
     , "  (cd /usr/share/doc/ghc/html/libraries; ./gen_contents_index)"
-    , "}"
-    , "op=$1"
-    , "shift"
-    , "$op $*" ]
+    , "}" ]
 
 findCLibs :: PackageDescription -> SystemProvides -> [String]
 findCLibs (PackageDescription { library = lib, executables = exe }) sysContext =
