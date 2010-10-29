@@ -54,7 +54,8 @@ getRepoFromDir path = do
   valid <- Dir.doesDirectoryExist path
   if valid
     then do
-      subthings <- Dir.getDirectoryContents path
+      subthings' <- Dir.getDirectoryContents path
+      let subthings = [ path </> x | x <- subthings', x /= ".", x /= ".." ]
       -- Read PkgBuilds
       contents <- foldM insertpkg M.empty subthings
       let result = SrcRepo { repo_path = path , repo_contents = contents }
