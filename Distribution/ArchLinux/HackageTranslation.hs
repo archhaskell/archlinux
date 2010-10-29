@@ -22,8 +22,6 @@ import Data.Maybe
 -- Read tarballs
 import qualified Codec.Archive.Tar as Tar
 import qualified Data.ByteString.Lazy.Char8 as Bytes
--- Debugging
-import Debug.Trace
 
 --
 -- | Reads a tarball and converts it to a list of PackageDescription's
@@ -40,6 +38,7 @@ getCabalFromEntry file = case Tar.entryContent file of
   Tar.NormalFile contents _ -> parse2maybe $ parsePackageDescription $ Bytes.unpack contents
   _ -> Nothing
 
+parse2maybe :: ParseResult a -> Maybe a
 parse2maybe a = case a of
       ParseOk _ pkg -> Just pkg
       _ -> Nothing
@@ -79,7 +78,7 @@ getVersionConflicts :: [GenericPackageDescription] -> SystemProvides -> [(Packag
 getVersionConflicts packages sysProvides = concat $ map conflicts cabals
   where cabals = mapMaybe (\p -> preprocessCabal p sysProvides) packages
         versions = M.fromList $ map (\p -> (pkgName $ packageId p, pkgVersion $ packageId p)) cabals
-        issatisfied d@(Dependency pkg range) = case M.lookup pkg versions of
+        issatisfied (Dependency pkg range) = case M.lookup pkg versions of
                                                  Nothing -> True
                                                  Just v -> v `withinRange` range
         conflicts p = map (\d -> (p,d)) $ filter (not . issatisfied) (buildDepends p)

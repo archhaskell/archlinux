@@ -222,7 +222,7 @@ stubPackageLibrary _ = emptyPkgBuild {
 -- | A PKGBUILD skeleton for Haskell programs (hasLibrary = False)
 --
 stubPackageProgram :: String -> PkgBuild
-stubPackageProgram hkgname = emptyPkgBuild {
+stubPackageProgram _ = emptyPkgBuild {
       arch_url     = "http://hackage.haskell.org/package/${_hkgname}"
     -- Hackage programs only need their own source to build
     , arch_source  = ArchList . return $
@@ -378,7 +378,8 @@ build() {
 -- Checker
 --
 
-type Warnings = String
+-- 2010-10-29: This code is unused. Do we still need it?
+-- type Warnings = String
 
 -- Hard code the cabal2arch version
 recentCabal2ArchVersion :: Maybe Version

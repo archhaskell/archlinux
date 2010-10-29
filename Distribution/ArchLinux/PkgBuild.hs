@@ -305,12 +305,14 @@ getInput    = GetPKG (\s -> Right (s,s))
 setInput   :: String -> GetPKG ()
 setInput s  = GetPKG (\_ -> Right ((),s))
 
-(<$>) :: Functor f => (a -> b) -> f a -> f b
-x <$> y = fmap x y
+-- 2010-10-29: This code is unused. Do we still need it?
+-- (<$>) :: Functor f => (a -> b) -> f a -> f b
+-- x <$> y = fmap x y
 
 ------------------------------------------------------------------------
 
 -- read until end of line
+line :: String -> GetPKG String
 line s = case break (== '\n') s of
     (h , _ : rest) -> do
         setInput rest
