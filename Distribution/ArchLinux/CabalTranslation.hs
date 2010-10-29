@@ -190,16 +190,16 @@ comment = render $ vcat
 -- | A PKGBUILD skeleton for Haskell libraries (hasLibrary = True)
 --
 stubPackageLibrary :: String -> PkgBuild
-stubPackageLibrary hkgname = emptyPkgBuild {
-      arch_url     = "http://hackage.haskell.org/package/" ++ hkgname
+stubPackageLibrary _ = emptyPkgBuild {
+      arch_url     = "http://hackage.haskell.org/package/${_hkgname}"
     -- All Hackage packages depend on GHC at build time
     -- All Haskell libraries are prefixed with "haskell-"
     , arch_makedepends = ArchList [] -- makedepends should not duplicate depends
     -- Hackage programs only need their own source to build
     , arch_source  = ArchList . return $
-          "http://hackage.haskell.org/packages/archive/" ++ hkgname ++ "/${pkgver}/" ++ hkgname ++ "-${pkgver}.tar.gz"
+          "http://hackage.haskell.org/packages/archive/${_hkgname}/${pkgver}/${_hkgname}-${pkgver}.tar.gz"
     , arch_build =
-        [ "cd ${srcdir}/" ++ hkgname ++ "-${pkgver}"
+        [ "cd ${srcdir}/${_hkgname}-${pkgver}"
         , "runhaskell Setup configure --prefix=/usr --docdir=/usr/share/doc/${pkgname} -O --enable-split-objs"
         , "runhaskell Setup build"
         , "runhaskell Setup haddock"
@@ -207,11 +207,11 @@ stubPackageLibrary hkgname = emptyPkgBuild {
         , "runhaskell Setup unregister --gen-script"
         ]
     , arch_package =
-        [ "cd ${srcdir}/" ++ hkgname ++ "-${pkgver}"
+        [ "cd ${srcdir}/${_hkgname}-${pkgver}"
         , "install -D -m744 register.sh   ${pkgdir}/usr/share/haskell/${pkgname}/register.sh"
         , "install    -m744 unregister.sh ${pkgdir}/usr/share/haskell/${pkgname}/unregister.sh"
         , "install -d -m755 ${pkgdir}/usr/share/doc/ghc/html/libraries"
-        , "ln -s /usr/share/doc/${pkgname}/html ${pkgdir}/usr/share/doc/ghc/html/libraries/" ++ hkgname
+        , "ln -s /usr/share/doc/${pkgname}/html ${pkgdir}/usr/share/doc/ghc/html/libraries/${_hkgname}"
         ,"runhaskell Setup copy --destdir=${pkgdir}"]
     -- if its a library:
     , arch_install = Just "${pkgname}.install"
@@ -222,17 +222,17 @@ stubPackageLibrary hkgname = emptyPkgBuild {
 --
 stubPackageProgram :: String -> PkgBuild
 stubPackageProgram hkgname = emptyPkgBuild {
-      arch_url     = "http://hackage.haskell.org/package/" ++ hkgname
+      arch_url     = "http://hackage.haskell.org/package/${_hkgname}"
     -- Hackage programs only need their own source to build
     , arch_source  = ArchList . return $
-          "http://hackage.haskell.org/packages/archive/" ++ hkgname ++ "/${pkgver}/" ++ hkgname ++ "-${pkgver}.tar.gz"
+          "http://hackage.haskell.org/packages/archive/${_hkgname}/${pkgver}/${_hkgname}-${pkgver}.tar.gz"
     , arch_build =
-        [ "cd ${srcdir}/" ++ hkgname ++ "-${pkgver}"
+        [ "cd ${srcdir}/${_hkgname}-${pkgver}"
         , "runhaskell Setup configure --prefix=/usr --docdir=/usr/share/doc/${pkgname} -O"
         , "runhaskell Setup build"
         ]
     , arch_package =
-        [ "cd ${srcdir}/" ++ hkgname ++ "-${pkgver}"
+        [ "cd ${srcdir}/${_hkgname}-${pkgver}"
         , "runhaskell Setup copy --destdir=${pkgdir}"]
     , arch_install = Nothing
     }
