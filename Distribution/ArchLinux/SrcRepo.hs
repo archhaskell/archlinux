@@ -66,7 +66,7 @@ insertpkg :: Map String PkgBuild -> FilePath -> IO (Map String PkgBuild)
 insertpkg m dir = do
   pkg <- getPkgFromDir dir
   case pkg of
-    Nothing -> return m
+    Nothing -> fail $ "cannot read PKGBUILD from " ++ show dir
     Just p -> return $ M.insert (takeBaseName dir) p m
 
 ---------------------------------------------------------------------------
