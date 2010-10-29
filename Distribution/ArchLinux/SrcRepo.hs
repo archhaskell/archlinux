@@ -30,6 +30,7 @@ data SrcRepo = SrcRepo
         -- The path to the repository
     , repo_contents :: M.Map String PkgBuild
     }
+    deriving (Show)
 
 --
 -- | Reads a directory into a package
