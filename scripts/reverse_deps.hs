@@ -2,14 +2,12 @@
 -- packages with respect to an ABS-like repository located at the
 -- path given as first command-line argument.
 
-module Main where
+module Main ( main ) where
 
-import Distribution.ArchLinux.SrcRepo
-import System.IO
-import System.Directory
-import System.Environment
-import Control.Monad
+import System.Environment ( getArgs )
+import Distribution.ArchLinux.SrcRepo ( getRepoFromDir, getReverseDependencies )
 
+main :: IO ()
 main = do
   habs:pkgs <- getArgs
   repo <- getRepoFromDir habs
