@@ -205,6 +205,7 @@ stubPackageLibrary _ = emptyPkgBuild {
         , "runhaskell Setup haddock"
         , "runhaskell Setup register   --gen-script"
         , "runhaskell Setup unregister --gen-script"
+        , "sed -i -r -e \"s|ghc-pkg.*unregister[^ ]* |&'--force' |\" unregister.sh"
         ]
     , arch_package =
         [ "cd ${srcdir}/${_hkgname}-${pkgver}"
