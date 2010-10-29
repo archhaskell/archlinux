@@ -181,10 +181,10 @@ x <-> y = x ++ "-" ++ y
 comment :: String
 comment = render $ vcat
  [ text "# Note: we list all package dependencies."
- , text "# Your package tool should understand 'provides' syntax"
+ , text "# Your package tool should understand 'provides' syntax."
+ , text "# See <http://archhaskell.wordpress.com/> for further information."
  , text "#"
- , text "# Keep up to date on http://archhaskell.wordpress.com/"
- , text "#"]
+ ]
 
 --
 -- | A PKGBUILD skeleton for Haskell libraries (hasLibrary = True)
