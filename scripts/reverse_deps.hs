@@ -13,7 +13,6 @@ import Control.Monad
 main = do
   habs:pkgs <- getArgs
   repo <- getRepoFromDir habs
-  print repo
   case repo of
     Nothing -> fail ("cannot load habs tree at " ++ show habs)
     Just r -> foldM (\a -> \s -> putStrLn s) () (getReverseDependencies pkgs r)
