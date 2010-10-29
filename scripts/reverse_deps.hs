@@ -15,4 +15,4 @@ main = do
   repo <- getRepoFromDir habs
   case repo of
     Nothing -> fail ("cannot load habs tree at " ++ show habs)
-    Just r -> foldM (\a -> \s -> putStrLn s) () (getReverseDependencies pkgs r)
+    Just r -> mapM_ putStrLn (filter (`notElem`pkgs) (getReverseDependencies pkgs r))
