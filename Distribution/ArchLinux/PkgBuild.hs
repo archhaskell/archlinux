@@ -182,10 +182,8 @@ instance Text ArchOptions where
 mydisp :: VersionInterval -> Doc
 mydisp (LowerBound v InclusiveBound, NoUpperBound) = if v==zeroVersion then empty else text ">=" <> disp v
 mydisp (LowerBound v ExclusiveBound, NoUpperBound) = text ">" <> disp v
-mydisp (lower, UpperBound v boundType) = maybeWarn (text symbol <> disp v)
-  where maybeWarn = if lower == LowerBound zeroVersion InclusiveBound then id
-                    else trace ("WARNING: arbitrary version interval requirements are unsupported, using <" ++ display v ++ " instead.")
-        symbol = if boundType == InclusiveBound then "<=" else "<"
+mydisp (_, UpperBound v boundType) = text symbol <> disp v
+  where symbol = if boundType == InclusiveBound then "<=" else "<"
 
 zeroVersion :: Version
 zeroVersion = Version [0] []
