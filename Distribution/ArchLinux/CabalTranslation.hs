@@ -44,7 +44,7 @@ preprocessCabal cabalsrc systemContext =
         []
         (const True) -- could check against prefered pkgs....
         (Platform X86_64 buildOS) -- linux/x86_64
-        (CompilerId GHC (Version [6,10,3] []))
+        (CompilerId GHC (Version [6,12,3] []))
 
         -- now constrain it to solve in the context of a modern ghc only
         (corePackages systemContext)
