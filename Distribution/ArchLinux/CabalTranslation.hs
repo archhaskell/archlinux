@@ -65,13 +65,15 @@ removeCoreFrom [] _             = []
 removeCoreFrom (x@(Dependency n vr):xs) systemContext =
   case find (\(Dependency k _) -> n == k) $ corePackages systemContext of
     -- haskell-parsec, haskell-quickcheck
-    Just (Dependency _ (ThisVersion v'))
-        | withinRange v' vr         ->     removeCoreFrom xs systemContext
-
     Just (Dependency (PackageName "base") _)
                                     ->     removeCoreFrom xs systemContext
 
-    Just (Dependency _ AnyVersion)  ->     removeCoreFrom xs systemContext
+    Just (Dependency _ corevr)
+        | isAnyVersion corevr       ->     removeCoreFrom xs systemContext
+        | isJust isspef && (withinRange (fromJust isspef) vr)
+                                    ->     removeCoreFrom xs systemContext
+       where isspef = isSpecificVersion corevr
+
     _                               -> x : removeCoreFrom xs systemContext
 
 ------------------------------------------------------------------------------------
@@ -132,7 +134,7 @@ cabal2pkg' cabal archName release systemContext
                then (stubPackageLibrary $ display name) {
                  arch_depends = (
                    if not (isLibrary)
-                   then ArchList [ArchDep (Dependency (PackageName "gmp") AnyVersion)]
+                   then ArchList [ArchDep (Dependency (PackageName "gmp") anyVersion)]
                         `mappend` anyClibraries
             -- libraries have 'register-time' dependencies on
             -- their dependent Haskell libraries.
@@ -142,7 +144,7 @@ cabal2pkg' cabal archName release systemContext
                else (stubPackageProgram $ display name) {
                  -- isLibrary = False automatically
                  arch_makedepends = my_makedepends
-               , arch_depends = ArchList [ArchDep (Dependency (PackageName "gmp") AnyVersion)]
+               , arch_depends = ArchList [ArchDep (Dependency (PackageName "gmp") anyVersion)]
                                 `mappend` anyClibraries
                }
 
@@ -153,7 +155,7 @@ cabal2pkg' cabal archName release systemContext
     my_makedepends =
       -- everything depends on ghc and Cabal 1.4.x
      ArchList
-        [(ArchDep (Dependency (PackageName "ghc")    AnyVersion))]
+        [(ArchDep (Dependency (PackageName "ghc") anyVersion))]
         `mappend`
      -- Haskell libraries
      -- TODO: use a real package spec to compute these names
@@ -170,7 +172,7 @@ cabal2pkg' cabal archName release systemContext
                           , d@(Dependency n _) <- buildTools b
                           , n /= PackageName "hsc2hs"
                           , let d' | n `elem` gtkTools
-                                        = Dependency (PackageName "gtk2hs-buildtools") AnyVersion
+                                        = Dependency (PackageName "gtk2hs-buildtools") anyVersion
                                    | otherwise        = d
                           ]
 
@@ -185,7 +187,7 @@ cabal2pkg' cabal archName release systemContext
     anyClibraries | null libs = ArchList []
                   | otherwise = ArchList libs
        where
-         libs = [ ArchDep (Dependency (PackageName s) AnyVersion) | s <- nub (findCLibs cabal systemContext) ]
+         libs = [ ArchDep (Dependency (PackageName s) anyVersion) | s <- nub (findCLibs cabal systemContext) ]
 
 (<->) :: String -> String -> String
 x <-> y = x ++ "-" ++ y
