@@ -8,7 +8,7 @@
 
 module Distribution.ArchLinux.CabalTranslation (
          preprocessCabal,
-         cabal2pkg,
+         cabal2pkg, cabal2pkg',
          oldCabal2Arch,
          install_hook_name
        ) where
@@ -77,10 +77,22 @@ removeCoreFrom (x@(Dependency n vr):xs) systemContext =
 ------------------------------------------------------------------------------------
 
 --
--- | Translate a generic cabal file into a PGKBUILD
+-- | Translate a generic cabal file into a PGKBUILD (using default
+--   values for pkgname and pkgrel).
 --
 cabal2pkg :: PackageDescription -> SystemProvides -> (AnnotatedPkgBuild, Maybe String)
-cabal2pkg cabal systemContext
+cabal2pkg cabal systemContext = cabal2pkg' cabal archName 1 systemContext
+  where
+    archName  = map toLower (if isLibrary then "haskell-" ++ display name else display name)
+    name      = pkgName (package cabal)
+    isLibrary = isJust (library cabal) && map toLower (display name) `notElem` shouldNotBeLibraries
+
+--
+-- | Translate a generic cabal file into a PGKBUILD, using the specified
+--   ArchLinux package name and package release.
+--
+cabal2pkg' :: PackageDescription -> String -> Int -> SystemProvides -> (AnnotatedPkgBuild, Maybe String)
+cabal2pkg' cabal archName release systemContext
 
 -- TODO decide if it's a library or an executable,
 -- handle multipackages
@@ -93,6 +105,7 @@ cabal2pkg cabal systemContext
     , pkgBody = stub {
       arch_pkgname = archName
     , arch_pkgver  = vers
+    , arch_pkgrel  = release
     , arch_pkgdesc = case synopsis cabal of
                           [] -> take 80 (description cabal)
                           s  -> s
@@ -133,7 +146,6 @@ cabal2pkg cabal systemContext
                                 `mappend` anyClibraries
                }
 
-    archName = map toLower (if isLibrary then "haskell-" ++ display name else display name)
     name     = pkgName (package cabal)
     vers     = pkgVersion (package cabal)
 
