@@ -25,7 +25,6 @@ import Distribution.ArchLinux.PkgBuild
 import Distribution.ArchLinux.SystemProvides
 -- Standard types
 import Distribution.Text
-import Text.PrettyPrint
 import Data.Char
 import Data.List
 import qualified Data.Map as M
@@ -102,7 +101,7 @@ cabal2pkg' cabal archName release systemContext
 
 -- = trace (show cabal) $
   = ( emptyPkg {
-      pkgHeader = comment
+      pkgHeader = []
     , hkgName = display name
     , pkgBody = stub {
       arch_pkgname = archName
@@ -191,14 +190,6 @@ cabal2pkg' cabal archName release systemContext
 
 (<->) :: String -> String -> String
 x <-> y = x ++ "-" ++ y
-
-comment :: String
-comment = render $ vcat
- [ text "# Note: we list all package dependencies."
- , text "# Your package tool should understand 'provides' syntax."
- , text "# See <http://archhaskell.wordpress.com/> for further information."
- , text "#"
- ]
 
 --
 -- | A PKGBUILD skeleton for Haskell libraries (hasLibrary = True)

@@ -323,7 +323,7 @@ readPackage st = do
   cs <- getInput
 
   case cs of
-    _ | "# Contributor"       `isPrefixOf` cs -> do
+    _ | "# Maintainer"       `isPrefixOf` cs -> do
             h <- line cs
             readPackage st { pkgHeader = h }
 
@@ -515,7 +515,7 @@ instance Text AnnotatedPkgBuild where
 -- Display a full PKGBUILD with contributor name
 --
 pkg2doc :: String -> AnnotatedPkgBuild -> Doc
-pkg2doc email pkg = text "# Contributor:" <+> text email $$ disp pkg
+pkg2doc email pkg = text "# Maintainer:" <+> text email $$ disp pkg
 
 --
 -- | A data type to represent a full ArchLinux package
