@@ -512,7 +512,7 @@ instance Text AnnotatedPkgBuild where
   parse = undefined
 
 --
--- Display a full PKGBUILD with contributor name
+-- Display a full PKGBUILD with Maintainer name.
 --
 pkg2doc :: String -> AnnotatedPkgBuild -> Doc
 pkg2doc email pkg = text "# Maintainer:" <+> text email $$ disp pkg
