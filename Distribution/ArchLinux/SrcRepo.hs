@@ -35,16 +35,12 @@ data SrcRepo = SrcRepo
 --
 -- | Reads a directory into a package
 --
-getPkgFromDir :: FilePath -> IO (Maybe PkgBuild)
+getPkgFromDir :: FilePath -> IO PkgBuild
 getPkgFromDir p = do
-  validdir <- Dir.doesFileExist (p </> "PKGBUILD")
-  if validdir
-    then do
-      pkg <- readFile (p </> "PKGBUILD")
-      case decodePackage pkg of
-        Left _ -> return Nothing
-        Right annot_pkg -> return $ Just (pkgBody annot_pkg)
-    else return Nothing
+  pkg <- readFile (p </> "PKGBUILD")
+  case decodePackage pkg of
+    Left e -> fail ("cannot parse " ++ show p ++ ": " ++ show e)
+    Right annot_pkg -> return (pkgBody annot_pkg)
 
 --
 -- | Reads a specified path into a SrcRepo structure
@@ -65,9 +61,7 @@ getRepoFromDir path = do
 insertpkg :: Map String PkgBuild -> FilePath -> IO (Map String PkgBuild)
 insertpkg m dir = do
   pkg <- getPkgFromDir dir
-  case pkg of
-    Nothing -> fail $ "cannot read PKGBUILD from " ++ show dir
-    Just p -> return $ M.insert (takeBaseName dir) p m
+  return $ M.insert (takeBaseName dir) pkg m
 
 ---------------------------------------------------------------------------
 --
