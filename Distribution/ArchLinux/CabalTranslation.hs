@@ -251,23 +251,23 @@ install_hook_name pkgname = pkgname <.> "install"
 
 install_hook :: String -> String
 install_hook pkgname = unlines
-    [ "HS_DIR=/usr/share/haskell/" ++ pkgname
+    [ "HS_DIR=usr/share/haskell/" ++ pkgname
     , "post_install() {"
     , "  ${HS_DIR}/register.sh"
-    , "  (cd /usr/share/doc/ghc/html/libraries; ./gen_contents_index)"
+    , "  (cd usr/share/doc/ghc/html/libraries; ./gen_contents_index)"
     , "}"
     , "pre_upgrade() {"
     , "  ${HS_DIR}/unregister.sh"
     , "}"
     , "post_upgrade() {"
     , "  ${HS_DIR}/register.sh"
-    , "  (cd /usr/share/doc/ghc/html/libraries; ./gen_contents_index)"
+    , "  (cd usr/share/doc/ghc/html/libraries; ./gen_contents_index)"
     , "}"
     , "pre_remove() {"
     , "  ${HS_DIR}/unregister.sh"
     , "}"
     , "post_remove() {"
-    , "  (cd /usr/share/doc/ghc/html/libraries; ./gen_contents_index)"
+    , "  (cd usr/share/doc/ghc/html/libraries; ./gen_contents_index)"
     , "}" ]
 
 findCLibs :: PackageDescription -> SystemProvides -> [String]
