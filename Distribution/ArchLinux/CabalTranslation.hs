@@ -53,7 +53,7 @@ preprocessCabal cabalsrc systemContext =
         Right (pkg,_) -> Just pkg { buildDepends = removeCoreFrom (buildDepends pkg) systemContext }
 
 -- attempt to filter out core packages we've already satisified
--- not actuall correct, since it doesn't take any version
+-- not actually correct, since it doesn't take any version
 -- info into account.
 --
 -- TODO this should use configDependency to find the precise
@@ -78,7 +78,7 @@ removeCoreFrom (x@(Dependency n vr):xs) systemContext =
 ------------------------------------------------------------------------------------
 
 --
--- | Translate a generic cabal file into a PGKBUILD (using default
+-- | Translate a generic cabal file into a PKGBUILD (using default
 --   values for pkgname and pkgrel).
 --
 cabal2pkg :: PackageDescription -> SystemProvides -> (AnnotatedPkgBuild, Maybe String)
@@ -89,7 +89,7 @@ cabal2pkg cabal systemContext = cabal2pkg' cabal archName 1 systemContext
     isLibrary = isJust (library cabal) && map toLower (display name) `notElem` shouldNotBeLibraries
 
 --
--- | Translate a generic cabal file into a PGKBUILD, using the specified
+-- | Translate a generic cabal file into a PKGBUILD, using the specified
 --   ArchLinux package name and package release.
 --
 cabal2pkg' :: PackageDescription -> String -> Int -> SystemProvides -> (AnnotatedPkgBuild, Maybe String)
