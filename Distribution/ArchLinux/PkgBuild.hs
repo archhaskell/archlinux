@@ -460,7 +460,7 @@ rawpkg2doc pkg = vcat
  , text "pkgrel"
     <=> int (arch_pkgrel pkg)
  , text "pkgdesc"
-    <=> text (show (arch_pkgdesc pkg))
+    <=> doubleQuotes (text $ escapeForBash $ arch_pkgdesc pkg)
  , text "url"
     <=> doubleQuotes (text (arch_url pkg))
  , text "license"
@@ -489,6 +489,15 @@ rawpkg2doc pkg = vcat
              (vcat $ (map text) (arch_package pkg))
    $$ char '}'
  ]
+
+--
+-- | Helper function to escape strings for PKGBUILDs
+--
+escapeForBash :: String -> String
+escapeForBash = concatMap escapeCharForBash
+
+escapeCharForBash c | elem c "$`\"\\\n" = ['\\', c]
+                    | otherwise = return c
 
 instance Text PkgBuild where
   disp p = rawpkg2doc p
