@@ -496,8 +496,13 @@ rawpkg2doc pkg = vcat
 escapeForBash :: String -> String
 escapeForBash = concatMap escapeCharForBash
 
-escapeCharForBash c | elem c "$`\"\\\n" = ['\\', c]
-                    | otherwise = return c
+escapeCharForBash c = case c of
+ '$'  ->  "\\$"
+ '`'  -> "'"
+ '"'  -> "'"
+ '\\' -> "\\\\"
+ '\n' -> " "
+ x    -> [x]
 
 instance Text PkgBuild where
   disp p = rawpkg2doc p
