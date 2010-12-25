@@ -46,7 +46,7 @@ uuid       e2fsprogs
 ev         libev
 pthread    glibc
 m          glibc
-gl         libgl
+gl         mesa
 glu        mesa
 glut       freeglut
 db_cxx     db
