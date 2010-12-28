@@ -498,8 +498,8 @@ escapeForBash = concatMap escapeCharForBash
 
 escapeCharForBash c = case c of
  '$'  ->  "\\$"
- '`'  -> "'"
- '"'  -> "'"
+ '`'  -> "\\`"
+ '"'  -> "\\\""
  '\\' -> "\\\\"
  '\n' -> " "
  x    -> [x]
