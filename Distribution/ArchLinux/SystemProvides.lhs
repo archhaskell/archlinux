@@ -4,7 +4,11 @@ License   : BSD3
 
 Maintainer: Arch Haskell Team <arch-haskell@haskell.org>
 
-> module Distribution.ArchLinux.SystemProvides where
+> module Distribution.ArchLinux.SystemProvides
+>  ( SystemProvides(..)
+>  , getDefaultSystemProvides
+>  , parseSystemProvides
+>  ) where
 
 Cabal modules
 
@@ -36,16 +40,14 @@ Get SystemProvides from package-installed files
 
 > getDefaultSystemProvides :: IO SystemProvides
 > getDefaultSystemProvides = do
->   fnc <- getDataFileName $ "data" </> "ghc-provides.txt"
->   fnt <- getDataFileName $ "data" </> "library-providers.txt"
->   getSystemProvidesFromFiles fnc fnt
+>   fc <- readFile =<< getDataFileName ("data" </> "ghc-provides.txt")
+>   ft <- readFile =<< getDataFileName ("data" </> "library-providers.txt")
+>   return $ parseSystemProvides fc ft
 
-> getSystemProvidesFromFiles :: FilePath -> FilePath -> IO SystemProvides
-> getSystemProvidesFromFiles filePkg fileTranslation = do
->   fc <- readFile filePkg
->   ft <- readFile fileTranslation
->   return SystemProvides { corePackages = corePackagesFromFile fc
->                         , translationTable = translationTableFromFile ft }
+> parseSystemProvides :: String -> String -> SystemProvides
+> parseSystemProvides sPkg sTranslation =
+>          SystemProvides { corePackages = parseDeplist sPkg
+>                         , translationTable = parseTranslationTable sTranslation }
 
 Extract GHC-provided dependencies from a file
 
@@ -53,8 +55,8 @@ Extract GHC-provided dependencies from a file
 > depstr2hs s | s == "" || head s == '#' = Nothing
 >             | otherwise = simpleParse s
 
-> corePackagesFromFile :: String -> [Dependency]
-> corePackagesFromFile srcfile1 = mapMaybe depstr2hs $ lines srcfile1
+> parseDeplist :: String -> [Dependency]
+> parseDeplist srcfile1 = mapMaybe depstr2hs $ lines srcfile1
 
 Now we translate the "library-providers" file. Any line beginning with "# "
 or lines with something else than two words are discarded. Lines should have
@@ -66,5 +68,5 @@ the form "libraryname packagename".
 >   a:b:_ -> Just (a,b)
 >   _ -> Nothing
 
-> translationTableFromFile :: String -> M.Map String String
-> translationTableFromFile srcfile2 = M.fromList $ mapMaybe trstr2hs $ lines srcfile2
+> parseTranslationTable :: String -> M.Map String String
+> parseTranslationTable srcfile2 = M.fromList $ mapMaybe trstr2hs $ lines srcfile2
