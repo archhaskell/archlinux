@@ -180,29 +180,36 @@ instance Text ArchOptions where
 -- the PKGBUILD version spec is less expressive than cabal, we can
 -- only handle simple intervals like (0,v) or (v,+infty)
 mydisp :: VersionInterval -> Doc
-mydisp (LowerBound v InclusiveBound, NoUpperBound) = if v==zeroVersion then empty else text ">=" <> disp v
-mydisp (LowerBound v ExclusiveBound, NoUpperBound) = text ">" <> disp v
-mydisp (_, UpperBound v boundType) = text symbol <> disp v
-  where symbol = if boundType == InclusiveBound then "<=" else "<"
+mydisp (LowerBound v t, NoUpperBound) =
+    case t of
+        InclusiveBound -> if v==zeroVersion then empty else text ">=" <> disp v
+        ExclusiveBound -> text ">" <> disp v
+mydisp (LowerBound v1 t1, UpperBound v2 t2) = text symbol <> disp v2
+    where symbol | v1 == v2             = "="
+                 | t2 == InclusiveBound = "<="
+                 | t2 == ExclusiveBound = "<"
 
 zeroVersion :: Version
 zeroVersion = Version [0] []
 
 instance Text ArchDep where
   disp (ArchDep (Dependency name ver)) =
-    disp name <> mydisp2 intervals
+    disp name <> mydisp (collapse intervals)
    where
       intervals = asVersionIntervals ver
       strName = display name
      --  >= (greater than or equal to), <= (less than or
      --  equal to), = (equal to), > (greater than), or <
-      mydisp2 l | l == []      = trace ("WARNING: version requirement for " ++
-                                   strName ++ " is logically impossible.") empty
-                | tail l == [] = mydisp $ head l
-                -- If there are multiple possible ranges, take only latest versions
-                | otherwise    = trace ("WARNING: multiple version ranges specified for " ++
-                                        strName ++ " using only the last one.") $ mydisp $ last l
-
+     --
+     --  Reduce intervals to a single one
+      collapse l | null l        = trace ("WARNING: version requirement for " ++
+                                       strName ++ " is logically impossible.")
+                                       (head $ asVersionIntervals anyVersion)
+                 | null $ tail l = head l
+                 -- If there are multiple possible ranges, take the interval that contains all
+                 | otherwise     = trace ("WARNING: multiple version ranges specified for " ++
+                                       strName ++ " using only the last one.")
+                                       (fst $ head l, snd $ last l)
   parse = undefined
 
 --
