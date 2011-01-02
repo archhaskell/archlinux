@@ -208,7 +208,7 @@ instance Text ArchDep where
                  | null $ tail l = head l
                  -- If there are multiple possible ranges, take the interval that contains all
                  | otherwise     = trace ("WARNING: multiple version ranges specified for " ++
-                                       strName ++ " using only the last one.")
+                                       strName ++ ", using the extremal bounds instead.")
                                        (fst $ head l, snd $ last l)
   parse = undefined
 
