@@ -6,7 +6,7 @@ Maintainer: Arch Haskell Team <arch-haskell@haskell.org>
 
 > module Distribution.ArchLinux.SystemProvides
 >  ( SystemProvides(..)
->  , getDefaultSystemProvides
+>  , emptySystemProvides
 >  , parseSystemProvides
 >  ) where
 
@@ -35,14 +35,13 @@ A big structure holding data about ArchLinux
 >      -- A hash-map where keys are library names and values are
 >      -- names of the corresponding ArchLinux package.
 >   }
+>   deriving (Show,Eq)
 
-Get SystemProvides from package-installed files
+Empty SystemProvides
 
-> getDefaultSystemProvides :: IO SystemProvides
-> getDefaultSystemProvides = do
->   fc <- readFile =<< getDataFileName ("data" </> "ghc-provides.txt")
->   ft <- readFile =<< getDataFileName ("data" </> "library-providers.txt")
->   return $ parseSystemProvides fc ft
+> emptySystemProvides = SystemProvides [] M.empty
+
+Get SystemProvides from files.
 
 > parseSystemProvides :: String -> String -> SystemProvides
 > parseSystemProvides sPkg sTranslation =
