@@ -30,6 +30,9 @@ A big structure holding data about ArchLinux
 >      -- ^
 >      -- A list of Dependencies which are automatically satified
 >      -- when GHC is installed.
+>   , platformPackages :: [Dependency]
+>      -- ^
+>      -- A list of packages to preferably use (e.g. Haskell Platform)
 >   , translationTable :: M.Map String String
 >      -- ^
 >      -- A hash-map where keys are library names and values are
@@ -39,23 +42,24 @@ A big structure holding data about ArchLinux
 
 Empty SystemProvides
 
-> emptySystemProvides = SystemProvides [] M.empty
+> emptySystemProvides = SystemProvides [] [] M.empty
 
 Get SystemProvides from files.
 
-> parseSystemProvides :: String -> String -> SystemProvides
-> parseSystemProvides sPkg sTranslation =
+> parseSystemProvides :: String -> String -> String -> SystemProvides
+> parseSystemProvides sPkg sPlat sTranslation =
 >          SystemProvides { corePackages = parseDeplist sPkg
+>                         , platformPackages = parseDeplist sPlat
 >                         , translationTable = parseTranslationTable sTranslation }
 
-Extract GHC-provided dependencies from a file
+Extract a list of dependency descriptions from a file
 
 > depstr2hs :: String -> Maybe Dependency
 > depstr2hs s | s == "" || head s == '#' = Nothing
 >             | otherwise = simpleParse s
 
 > parseDeplist :: String -> [Dependency]
-> parseDeplist srcfile1 = mapMaybe depstr2hs $ lines srcfile1
+> parseDeplist srcfile = mapMaybe depstr2hs $ lines srcfile
 
 Now we translate the "library-providers" file. Any line beginning with "# "
 or lines with something else than two words are discarded. Lines should have

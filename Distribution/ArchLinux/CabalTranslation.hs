@@ -46,7 +46,7 @@ preprocessCabal cabalsrc systemContext =
         (CompilerId GHC (Version [6,12,3] []))
 
         -- now constrain it to solve in the context of a modern ghc only
-        (corePackages systemContext)
+        (corePackages systemContext ++ platformPackages systemContext)
         cabalsrc
      of
         Left deps     -> trace ("Unresolved dependencies: " ++show deps) Nothing
