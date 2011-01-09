@@ -535,29 +535,3 @@ instance Text AnnotatedPkgBuild where
 --
 pkg2doc :: String -> AnnotatedPkgBuild -> Doc
 pkg2doc email pkg = text "# Maintainer:" <+> text email $$ disp pkg
-
---
--- | A data type to represent a full ArchLinux package
---
-data ArchPackage = ArchPackage
-  { archpkg_pkgbuild :: AnnotatedPkgBuild
-        -- ^
-        -- The annotated PKGBUILD file
-  , archpkg_install :: Maybe String
-        -- ^
-        -- The contents of the install script if it exists.
-  , archpkg_others :: [(String, String)]
-        -- ^
-        -- A list of additional files (filename, contents)
-  }
-
---
--- | An empty package
---
-emptyArchPkg :: ArchPackage
-emptyArchPkg = ArchPackage
-  { archpkg_pkgbuild = emptyPkg
-  , archpkg_install = Nothing
-  , archpkg_others = []
-  }
-
