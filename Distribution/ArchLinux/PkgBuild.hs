@@ -184,7 +184,7 @@ mydisp (LowerBound v t, NoUpperBound) =
     case t of
         InclusiveBound -> if v==zeroVersion then empty else text ">=" <> disp v
         ExclusiveBound -> text ">" <> disp v
-mydisp (LowerBound v1 t1, UpperBound v2 t2) = text symbol <> disp v2
+mydisp (LowerBound v1 _, UpperBound v2 t2) = text symbol <> disp v2
     where symbol | v1 == v2             = "="
                  | t2 == InclusiveBound = "<="
                  | t2 == ExclusiveBound = "<"
@@ -503,6 +503,7 @@ rawpkg2doc pkg = vcat
 escapeForBash :: String -> String
 escapeForBash = concatMap escapeCharForBash
 
+escapeCharForBash :: Char -> String
 escapeCharForBash c = case c of
  '$'  ->  "\\$"
  '`'  -> "\\`"

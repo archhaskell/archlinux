@@ -39,6 +39,7 @@ A big structure holding data about ArchLinux
 
 Empty SystemProvides
 
+> emptySystemProvides :: SystemProvides
 > emptySystemProvides = SystemProvides [] [] M.empty
 
 Get SystemProvides from files.
