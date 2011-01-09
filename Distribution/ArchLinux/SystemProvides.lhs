@@ -19,9 +19,6 @@ Standard types
 > import Distribution.Text
 > import qualified Data.Map as M
 > import Data.Maybe
-> import System.FilePath
-
-> import Paths_archlinux
 
 A big structure holding data about ArchLinux
 
