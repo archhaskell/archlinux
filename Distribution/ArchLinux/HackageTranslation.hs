@@ -76,12 +76,12 @@ getSpecifiedCabals list packages = filter wasSpecified packages
 --
 getVersionConflicts :: [GenericPackageDescription] -> SystemProvides -> [(PackageDescription, Dependency)]
 getVersionConflicts packages sysProvides = concat $ map conflicts cabals
-  where cabals = mapMaybe (\p -> preprocessCabal p sysProvides) packages
-        versions = M.fromList $ map (\p -> (pkgName $ packageId p, pkgVersion $ packageId p)) cabals
+  where cabals = mapMaybe (\ p -> preprocessCabal p [] sysProvides) packages
+        versions = M.fromList $ map (\ (p, _) -> (pkgName $ packageId p, pkgVersion $ packageId p)) cabals
         issatisfied (Dependency pkg range) = case M.lookup pkg versions of
                                                  Nothing -> True
                                                  Just v -> v `withinRange` range
-        conflicts p = map (\d -> (p,d)) $ filter (not . issatisfied) (buildDepends p)
+        conflicts (p, _) = map (\d -> (p,d)) $ filter (not . issatisfied) (buildDepends p)
 
 --
 -- | Returns the latest versions

@@ -37,20 +37,19 @@ import Debug.Trace
 --
 -- | Configure package for system
 --
-preprocessCabal :: GenericPackageDescription -> SystemProvides -> Maybe PackageDescription
-preprocessCabal cabalsrc systemContext =
+preprocessCabal :: GenericPackageDescription -> FlagAssignment -> SystemProvides -> Maybe (PackageDescription, FlagAssignment)
+preprocessCabal cabalsrc flags systemContext =
      case finalizePackageDescription
-        []
+        flags
         (const True) -- could check against prefered pkgs....
         (Platform X86_64 buildOS) -- linux/x86_64
         (CompilerId GHC (Version [6,12,3] []))
-
         -- now constrain it to solve in the context of a modern ghc only
         (corePackages systemContext ++ platformPackages systemContext)
         cabalsrc
      of
         Left deps     -> trace ("Unresolved dependencies: " ++show deps) Nothing
-        Right (pkg,_) -> Just pkg { buildDepends = removeCoreFrom (buildDepends pkg) systemContext }
+        Right (pkg, fs) -> Just (pkg { buildDepends = removeCoreFrom (buildDepends pkg) systemContext }, fs)
 
 -- attempt to filter out core packages we've already satisified
 -- not actually correct, since it doesn't take any version
