@@ -262,6 +262,7 @@ data AnnotatedPkgBuild =
         {pkgBuiltWith :: Maybe Version   -- ^ version of cabal2arch used, if any
         ,pkgHeader    :: String          -- ^ header strings
         ,hkgName      :: String          -- ^ package name on Hackage
+        ,cblFlags     :: String          -- ^ flags to be passed to configure action
         ,pkgBody      :: PkgBuild }      -- ^ contents of pkgbuild file
     deriving (Eq, Show)
 
@@ -271,6 +272,7 @@ emptyPkg = AnnotatedPkgBuild
     { pkgBuiltWith = Nothing
     , pkgHeader    = []
     , hkgName      = []
+    , cblFlags     = []
     , pkgBody      = emptyPkgBuild { arch_options = ArchList []
                                 , arch_makedepends = ArchList []
                                 }
@@ -347,6 +349,9 @@ readPackage st = do
             let s = drop 9 h
             readPackage st { hkgName = s }
 
+      | "_cblflags=" `isPrefixOf` cs -> do
+            h <- line cs
+            readPackage st { cblFlags = drop 10 h }
       | "pkgname="  `isPrefixOf` cs -> do
             h <- line cs
             let s = drop 8 h
@@ -524,9 +529,11 @@ instance Text AnnotatedPkgBuild where
     pkgBuiltWith = ver,
     pkgHeader = header,
     hkgName = hkg,
+    cblFlags = flags,
     pkgBody = pkg
   } = vcat [ if null header then empty else text header
            , text "_hkgname" <=> text hkg
+           , text "_cblflags" <=> char '"' <> text flags <> char '"'
            , disp pkg ]
   parse = undefined
 

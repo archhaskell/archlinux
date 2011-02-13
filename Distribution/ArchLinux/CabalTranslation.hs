@@ -80,8 +80,8 @@ removeCoreFrom (x@(Dependency n vr):xs) systemContext =
 -- | Translate a generic cabal file into a PKGBUILD (using default
 --   values for pkgname and pkgrel).
 --
-cabal2pkg :: PackageDescription -> SystemProvides -> (AnnotatedPkgBuild, Maybe String)
-cabal2pkg cabal systemContext = cabal2pkg' cabal archName 1 systemContext
+cabal2pkg :: PackageDescription -> FlagAssignment -> SystemProvides -> (AnnotatedPkgBuild, Maybe String)
+cabal2pkg cabal flags systemContext = cabal2pkg' cabal flags archName 1 systemContext
   where
     archName  = map toLower (if isLibrary then "haskell-" ++ display name else display name)
     name      = pkgName (package cabal)
@@ -91,8 +91,8 @@ cabal2pkg cabal systemContext = cabal2pkg' cabal archName 1 systemContext
 -- | Translate a generic cabal file into a PKGBUILD, using the specified
 --   ArchLinux package name and package release.
 --
-cabal2pkg' :: PackageDescription -> String -> Int -> SystemProvides -> (AnnotatedPkgBuild, Maybe String)
-cabal2pkg' cabal archName release systemContext
+cabal2pkg' :: PackageDescription -> FlagAssignment -> String -> Int -> SystemProvides -> (AnnotatedPkgBuild, Maybe String)
+cabal2pkg' cabal flags archName release systemContext
 
 -- TODO decide if it's a library or an executable,
 -- handle multipackages
@@ -102,6 +102,7 @@ cabal2pkg' cabal archName release systemContext
   = ( emptyPkg {
       pkgHeader = []
     , hkgName = display name
+    , cblFlags = flags2Args flags
     , pkgBody = stub {
       arch_pkgname = archName
     , arch_pkgver  = vers
@@ -128,6 +129,10 @@ cabal2pkg' cabal archName release systemContext
     )
 
   where
+    flags2Args [] = []
+    flags2Args fs = foldl1 (\ a b -> a ++ " " ++ b) $ map f2a fs
+        where
+            f2a (FlagName fn, fa) = if fa then fn else ('-':fn)
     stub = if hasLibrary
                then (stubPackageLibrary $ display name) {
                  arch_depends = (
@@ -205,7 +210,8 @@ stubPackageLibrary _ = emptyPkgBuild {
     , arch_build =
         [ "cd ${srcdir}/${_hkgname}-${pkgver}"
         , "runhaskell Setup configure -O --enable-split-objs --enable-shared \\"
-        , "   --prefix=/usr --docdir=/usr/share/doc/${pkgname} --libsubdir=\\$compiler/site-local/\\$pkgid"
+        , "   --prefix=/usr --docdir=/usr/share/doc/${pkgname} --libsubdir=\\$compiler/site-local/\\$pkgid \\"
+        , "   --flags=\"$_cblflags\""
         , "runhaskell Setup build"
         , "runhaskell Setup haddock"
         , "runhaskell Setup register   --gen-script"
@@ -234,7 +240,8 @@ stubPackageProgram _ = emptyPkgBuild {
           "http://hackage.haskell.org/packages/archive/${_hkgname}/${pkgver}/${_hkgname}-${pkgver}.tar.gz"
     , arch_build =
         [ "cd ${srcdir}/${_hkgname}-${pkgver}"
-        , "runhaskell Setup configure --prefix=/usr --docdir=/usr/share/doc/${pkgname} -O"
+        , "runhaskell Setup configure --prefix=/usr --docdir=/usr/share/doc/${pkgname} -O \\"
+        , "   --flags=\"$_cblflags\""
         , "runhaskell Setup build"
         ]
     , arch_package =
