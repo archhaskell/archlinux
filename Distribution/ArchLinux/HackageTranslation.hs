@@ -6,69 +6,21 @@
 -- Maintainer: Arch Haskell Team <arch-haskell@haskell.org>
 --
 
-module Distribution.ArchLinux.HackageTranslation where
+module Distribution.ArchLinux.HackageTranslation
+  ( getVersionConflicts
+  , getLatestVersions
+  )
+  where
+
 import Distribution.ArchLinux.CabalTranslation
 import Distribution.ArchLinux.SystemProvides
 -- Cabal modules
 import Distribution.Package
 import Distribution.Version
 import Distribution.PackageDescription
-import Distribution.PackageDescription.Parse
 -- Standard types
-import Distribution.Text
 import qualified Data.Map as M
-import qualified Data.Set as Set
 import Data.Maybe
--- Read tarballs
-import qualified Codec.Archive.Tar as Tar
-import qualified Data.ByteString.Lazy.Char8 as Bytes
-
---
--- | Reads a tarball and converts it to a list of PackageDescription's
---
-getCabalsFromTarball :: Bytes.ByteString -> [GenericPackageDescription]
-getCabalsFromTarball tarball = Tar.foldEntries insertThis [] (const []) files
-  where files = Tar.read tarball
-        insertThis file list = case getCabalFromEntry file of
-          Nothing -> list
-          Just pkg -> pkg:list
-
-getCabalFromEntry :: Tar.Entry -> Maybe GenericPackageDescription
-getCabalFromEntry file = case Tar.entryContent file of
-  Tar.NormalFile contents _ -> parse2maybe $ parsePackageDescription $ Bytes.unpack contents
-  _ -> Nothing
-
-parse2maybe :: ParseResult a -> Maybe a
-parse2maybe a = case a of
-      ParseOk _ pkg -> Just pkg
-      _ -> Nothing
-
---
--- | Reads a tarball and get cabal files according to a list
---
-getSpecifiedCabalsFromTarball :: Bytes.ByteString -> [String] -> [GenericPackageDescription]
-getSpecifiedCabalsFromTarball tarball list =
-  getSpecifiedCabals (mapMaybe parsePackageIdentifier list) (getCabalsFromTarball tarball)
-
---
--- | Parses a list of lines of the form "package-name 1.2.3.4"
---
-parsePackageIdentifier :: String -> Maybe PackageIdentifier
-parsePackageIdentifier s = case words s of
-  []             -> void
-  "#":_          -> void
-  name:version:_ -> case simpleParse version of
-        Nothing -> err
-        Just v -> Just $ PackageIdentifier { pkgName = PackageName name, pkgVersion = v }
-  _ -> err
- where
-  void = Nothing
-  err = error ("Malformed package identifier " ++ show s)
-
-getSpecifiedCabals :: [PackageIdentifier] -> [GenericPackageDescription] -> [GenericPackageDescription]
-getSpecifiedCabals list packages = filter wasSpecified packages
-  where set = Set.fromList list
-        wasSpecified p = Set.member (packageId p) set
 
 --
 -- | Check for inconsistencies in version requirements

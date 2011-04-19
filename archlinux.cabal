@@ -23,15 +23,18 @@ source-repository head
   location:     git://github.com/archhaskell/archlinux.git
 
 library
-    build-depends:  base >= 4 && < 6,
-                    Cabal >= 1.6,
-                    pretty,
-                    containers,
-                    directory,
-                    filepath
+  ghc-Options:	-Wall
+  build-depends:
+    base >= 4 && < 6,
+    Cabal >= 1.6,
+    pretty,
+    containers,
+    directory,
+    filepath
 
-    exposed-modules:
-        Distribution.ArchLinux.PkgBuild
-        Distribution.ArchLinux.SrcRepo
-        Distribution.ArchLinux.CabalTranslation
-        Distribution.ArchLinux.SystemProvides
+  exposed-modules:
+    Distribution.ArchLinux.PkgBuild
+    Distribution.ArchLinux.SrcRepo
+    Distribution.ArchLinux.CabalTranslation
+    Distribution.ArchLinux.SystemProvides
+    Distribution.ArchLinux.HackageTranslation
