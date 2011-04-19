@@ -28,28 +28,10 @@ library
                     pretty,
                     containers,
                     directory,
-                    filepath,
-                    bytestring,
-                    tar
+                    filepath
 
     exposed-modules:
         Distribution.ArchLinux.PkgBuild
         Distribution.ArchLinux.SrcRepo
         Distribution.ArchLinux.CabalTranslation
-        Distribution.ArchLinux.HackageTranslation
         Distribution.ArchLinux.SystemProvides
-    other-modules:
-        Paths_archlinux
-
-executable recdeps
-    main-is: scripts/recdeps.hs
-    build-depends:
-        base >=4 && <6,
-        directory,
-        filepath,
-        containers,
-        pretty,
-        Cabal >= 1.6
-    other-modules:
-        Distribution.ArchLinux.PkgBuild
-        Distribution.ArchLinux.SrcRepo
