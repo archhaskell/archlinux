@@ -219,7 +219,8 @@ stubPackageLibrary _ = emptyPkgBuild {
         , "install    -m744 unregister.sh ${pkgdir}/usr/share/haskell/${pkgname}/unregister.sh"
         , "install -d -m755 ${pkgdir}/usr/share/doc/ghc/html/libraries"
         , "ln -s /usr/share/doc/${pkgname}/html ${pkgdir}/usr/share/doc/ghc/html/libraries/${_hkgname}"
-        ,"runhaskell Setup copy --destdir=${pkgdir}"]
+        , "runhaskell Setup copy --destdir=${pkgdir}"
+        ]
     -- if its a library:
     , arch_install = Just "${pkgname}.install"
     }
