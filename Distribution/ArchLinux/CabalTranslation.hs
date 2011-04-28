@@ -301,6 +301,7 @@ shouldNotBeLibraries =
     ,"hspresent"
     ,"haskell-platform"
     ,"xmonad-contrib"
+    ,"xmonad-extras"
     ,"lambdabot"
     ,"piet"
     ,"hsffig"
