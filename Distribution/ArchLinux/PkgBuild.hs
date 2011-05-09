@@ -478,7 +478,7 @@ rawpkg2doc pkg = vcat
     <=> disp (arch_makedepends pkg)
  , case arch_depends pkg of
         ArchList [] -> empty
-        _           -> text "depends" <=> disp (arch_depends pkg)
+        ArchList xs -> text "depends" <=> disp (ArchList (nub xs))
  , text "options" <=> disp (arch_options pkg)
  , text "source"
     <=> dispNoQuotes (arch_source pkg)
