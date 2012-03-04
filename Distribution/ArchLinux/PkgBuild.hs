@@ -1,5 +1,6 @@
 {-# LANGUAGE TypeSynonymInstances       #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE FlexibleInstances #-}
 -- |
 -- Module    : Distribution.ArchLinux.PkgBuild
 -- Copyright : (c) Don Stewart, 2008-2010
