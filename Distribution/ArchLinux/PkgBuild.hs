@@ -28,7 +28,7 @@ import Distribution.License
 
 import Text.PrettyPrint
 import Data.List
-import Data.Monoid
+import Data.Monoid hiding ((<>))
 import Debug.Trace
 
 import Control.Monad
