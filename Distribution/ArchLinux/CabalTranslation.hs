@@ -208,7 +208,7 @@ stubPackageLibrary _ = emptyPkgBuild {
         , "runhaskell Setup configure -O ${PKGBUILD_HASKELL_ENABLE_PROFILING:+-p } --enable-split-objs --enable-shared \\"
         , "   --prefix=/usr --docdir=/usr/share/doc/${pkgname} --libsubdir=\\$compiler/site-local/\\$pkgid"
         , "runhaskell Setup build"
-        , "runhaskell Setup haddock"
+        , "runhaskell Setup haddock --html --hoogle"
         , "runhaskell Setup register   --gen-script"
         , "runhaskell Setup unregister --gen-script"
         , "sed -i -r -e \"s|ghc-pkg.*unregister[^ ]* |&'--force' |\" unregister.sh"
