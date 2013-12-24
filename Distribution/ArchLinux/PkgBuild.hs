@@ -1,5 +1,6 @@
 {-# LANGUAGE TypeSynonymInstances       #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE FlexibleInstances #-}
 -- |
 -- Module    : Distribution.ArchLinux.PkgBuild
 -- Copyright : (c) Don Stewart, 2008-2010
@@ -28,7 +29,7 @@ import Distribution.License
 
 import Text.PrettyPrint
 import Data.List
-import Data.Monoid
+import Data.Monoid hiding ((<>))
 import Debug.Trace
 
 import Control.Monad
