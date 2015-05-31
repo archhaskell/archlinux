@@ -32,8 +32,8 @@ import Data.List
 import Data.Monoid hiding ((<>))
 import Debug.Trace
 
+import Control.Applicative (Applicative(..))
 import Control.Monad
-import Control.Monad.Instances
 import Data.Char
 
 
@@ -287,6 +287,10 @@ decodePackage s = runGetPKG (readPackage emptyPkg) s
 newtype GetPKG a = GetPKG { un :: String -> Either String (a,String) }
 
 instance Functor GetPKG where fmap = liftM
+
+instance Applicative GetPKG where
+    pure = return
+    (<*>) = ap
 
 instance Monad GetPKG where
   return x       = GetPKG (\s -> Right (x,s))
