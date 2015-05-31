@@ -43,7 +43,7 @@ preprocessCabal cabalsrc systemContext =
         []
         (const True) -- could check against prefered pkgs....
         (Platform X86_64 buildOS) -- linux/x86_64
-        (CompilerId GHC (Version [7,0,3] []))
+        (CompilerInfo (CompilerId GHC (Version [7,0,3] [])) NoAbiTag Nothing Nothing Nothing)
 
         -- now constrain it to solve in the context of a modern ghc only
         (corePackages systemContext ++ platformPackages systemContext)
@@ -117,9 +117,9 @@ cabal2pkg' cabal archName release systemContext
                 x@LGPL {} -> x
                 l    -> UnknownLicense ("custom:"++ show l)
     , arch_package = (arch_package stub) ++
-         (if not (null (licenseFile cabal)) && (case license cabal of GPL {} -> False; LGPL {} -> False; _ -> True)
+         (if not (null (licenseFiles cabal)) && (case license cabal of GPL {} -> False; LGPL {} -> False; _ -> True)
           then
-              [ "install -D -m644 " ++ licenseFile cabal ++ " ${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+              [ "install -D -m644 " ++ unwords (licenseFiles cabal) ++ " ${pkgdir}/usr/share/licenses/${pkgname}/"
               , "rm -f ${pkgdir}/usr/share/doc/${pkgname}/LICENSE"
               ]
           else []) }
