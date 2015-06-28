@@ -176,7 +176,7 @@ newtype ArchDep = ArchDep Dependency
 
 instance Text ArchOptions where
   disp Strip = text "strip"
-  parse = undefined
+  parse = error "Text.parse not defined for ArchOptions"
 
 -- the PKGBUILD version spec is less expressive than cabal, we can
 -- only handle simple intervals like (0,v) or (v,+infty)
@@ -211,7 +211,7 @@ instance Text ArchDep where
                  | otherwise     = trace ("WARNING: multiple version ranges specified for " ++
                                        strName ++ ", using the extremal bounds instead.")
                                        (fst $ head l, snd $ last l)
-  parse = undefined
+  parse = error "Text.parse not defined for ArchDep"
 
 --
 -- | Extract just the package name from ArchDep
@@ -229,7 +229,7 @@ instance Text ArchArch where
     disp x = case x of
        Arch_X86      -> text "i686"
        Arch_X86_64   -> text "x86_64"
-    parse = error "Text.parrse not defined for ArchList"
+    parse = error "Text.parse not defined for ArchList"
 
 -- Lists with quotes
 newtype ArchList a = ArchList [a]
@@ -519,7 +519,7 @@ escapeCharForBash c = case c of
 
 instance Text PkgBuild where
   disp p = rawpkg2doc p
-  parse = undefined
+  parse = error "Text.parse not defined for PkgBuild"
 
 --
 -- Display a PKGBUILD with header
@@ -533,7 +533,7 @@ instance Text AnnotatedPkgBuild where
   } = vcat [ if null header then empty else text header
            , text "_hkgname" <=> text hkg
            , disp pkg ]
-  parse = undefined
+  parse = error "Text.parse not defined for AnnotatedPkgBuild"
 
 --
 -- Display a full PKGBUILD with Maintainer name.
